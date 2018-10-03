@@ -109,7 +109,7 @@ var rangeSlider = 0,
     };
 //<-- variables and constants for range slider
 
-$.getJSON('data.json', function(info){
+$.getJSON('https://dl.dropboxusercontent.com/s/3aqbpvn6kar1a87/data.json', function(info){
     data = info;
 
     var count = Object.keys(data).length;
