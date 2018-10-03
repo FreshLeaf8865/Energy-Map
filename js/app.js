@@ -39,6 +39,7 @@ var frustumSize = 1000;
 const V32 = 6713924.71096368, V33 = 9220164.67645724, V34 = 6696779.94470847, V35 = 0, W32 = 147694.905991326, W33 = 62164.7495848525, W34 = 63714.9196865604, W35 = 0, X35 = 23244349.8830916, Y35 = 3402810.70215527, Z35 = 1927823.98763521;
 var rA1, rA2, rA3, rA4, rA5, rA6, ciA1, ciA2, ciA3, ciA4, ciA5, ciA6, tA1, tA2, tA3, tA4, tA5, tA6;
 var rangeSlider = 0,
+    dataCubeChart = [],
     dataRange = [
         10, // CL
         20,  // PA
@@ -109,6 +110,14 @@ var rangeSlider = 0,
     };
 //<-- variables and constants for range slider
 
+// data for cube
+$.getJSON('https://dl.dropboxusercontent.com/s/2wlj6asyoai8dk0/cube_test.json', function (info) {
+    var count = Object.keys(info).length;
+    for (var i = 1; i <= count; i++) {
+        dataCubeChart.push(info[i]);
+    }
+});
+
 $.getJSON('https://dl.dropboxusercontent.com/s/3aqbpvn6kar1a87/data.json', function(info){
     data = info;
 
@@ -160,6 +169,7 @@ $.getJSON('https://dl.dropboxusercontent.com/s/3aqbpvn6kar1a87/data.json', funct
     });
 
 });
+
 
 
 // RETURN UNIQUE VALUE
@@ -215,9 +225,9 @@ function createMultiRangeSlider(inputRange) {
  */
 function initRangeSlider() {
     // init values
-    var filteredDataLen = filteredData.length, clSum = ngSum = paSum = checkSum = 0;
+    var filteredDataLen = dataCubeChart.length, clSum = ngSum = paSum = checkSum = 0;
     for (var i = 0; i < filteredDataLen; i++) {
-        var filteredDataItem = filteredData[i], filterDataItemType = filteredDataItem.Type;
+        var filteredDataItem = dataCubeChart[i], filterDataItemType = filteredDataItem.Type;
 
         if (filterDataItemType == "B") {
             clPercent = parseFloat(filteredDataItem['11']) / V32 * 100;
@@ -281,9 +291,9 @@ function updateRangeSlider(values, handle) {
     }
 
     // generate data from slider changes
-    var updatedData = [], updatedDataLen = filteredData.length;
+    var updatedData = [], updatedDataLen = dataCubeChart.length;
     for (var i = 0; i < updatedDataLen; i++) {
-        var updatedDataItem = {}, updatedDataItemType = filteredData[i].Type;
+        var updatedDataItem = {}, updatedDataItemType = dataCubeChart[i].Type;
 
         if (updatedDataItemType == "B") {
             updatedDataItem['11'] = String(dataParamByIndex['cl'] * V32 / 100);
@@ -304,14 +314,14 @@ function updateRangeSlider(values, handle) {
         } else {
             for (var j = 1; j <= 3; j++) {
                 for (var k = 1; k <= 3; k++) {
-                    updatedDataItem[String(j) + String(k)] = filteredData[i][String(j) + String(k)];
+                    updatedDataItem[String(j) + String(k)] = dataCubeChart[i][String(j) + String(k)];
                 }
             }
         }
 
-        updatedDataItem['State'] = filteredData[i].State;
-        updatedDataItem['Type'] = filteredData[i].Type;
-        updatedDataItem['Year'] = filteredData[i].Year;
+        updatedDataItem['State'] = dataCubeChart[i].State;
+        updatedDataItem['Type'] = dataCubeChart[i].Type;
+        updatedDataItem['Year'] = dataCubeChart[i].Year;
         updatedData.push(updatedDataItem);
     }
 
