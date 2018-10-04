@@ -187,3 +187,140 @@ span.value {
   left: 0;
   width: 100%;
 }
+.noUi-horizontal .noUi-origin:focus {
+  outline: none !important;
+}
+.noUi-handle:before,
+.noUi-handle:after {
+  content: attr(data-before);
+  color: #000;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 20px;
+  background: #fff;
+}
+.hexagon {
+  position: relative;
+  width: 64px;
+  height: 36.95px;
+  background-color: #64C7CC;
+  margin: 18.47px 0;
+  padding: 0;
+  text-align: left;
+  margin: 18.47px 0;
+  color: #fff;
+  border: none;
+  border-radius: 0px;
+}
+.hexagon:before,
+.hexagon:after {
+  content: "";
+  position: absolute;
+  width: 0;
+  border-left: 32px solid transparent;
+  border-right: 32px solid transparent;
+}
+.hexagon:before {
+  bottom: 100%;
+  border-bottom: 18.47px solid #64C7CC;
+}
+.hexagon:after {
+  top: 100%;
+  left: 0;
+  width: 0;
+  border-top: 18.47px solid #64C7CC;
+}
+.noUi-horizontal .noUi-tooltip-text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  margin-bottom: 0;
+}
+.noUi-horizontal .noUi-tooltip.hexagon {
+  bottom: 75px;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.coal {
+  background-color: #404040;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.coal:before {
+  border-bottom-color: #404040;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.coal:after {
+  border-top-color: #404040;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.petroleum {
+  background-color: #808080;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.petroleum:before {
+  border-bottom-color: #808080;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.petroleum:after {
+  border-top-color: #808080;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.natural-gas {
+  background-color: #bfbfbf;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.natural-gas:before {
+  border-bottom-color: #bfbfbf;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.natural-gas:after {
+  border-top-color: #bfbfbf;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.nuclear {
+  background-color: #D9444E;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.nuclear:before {
+  border-bottom-color: #D9444E;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.nuclear:after {
+  border-top-color: #D9444E;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.hydro {
+  background-color: #4E6EB1;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.hydro:before {
+  border-bottom-color: #4E6EB1;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.hydro:after {
+  border-top-color: #4E6EB1;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.biomass {
+  background-color: #9DD7A5;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.biomass:before {
+  border-bottom-color: #9DD7A5;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.biomass:after {
+  border-top-color: #9DD7A5;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.wind {
+  background-color: #3C8FBB;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.wind:before {
+  border-bottom-color: #3C8FBB;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.wind:after {
+  border-top-color: #3C8FBB;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.solar {
+  background-color: #FFDB87;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.solar:before {
+  border-bottom-color: #FFDB87;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.solar:after {
+  border-top-color: #FFDB87;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.geothermal {
+  background-color: #F77C48;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.geothermal:before {
+  border-bottom-color: #F77C48;
+}
+.noUi-horizontal .noUi-tooltip.hexagon.geothermal:after {
+  border-top-color: #F77C48;
+}

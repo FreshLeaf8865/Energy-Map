@@ -62,7 +62,7 @@ var rangeSlider = 0,
         90,  // A1
         95  // A3
     ],
-    dataRangeLabel = [
+    dataRangeLabelCode = [
         "CL",
         "PA",
         "NG",
@@ -72,6 +72,29 @@ var rangeSlider = 0,
         "A2",
         "A1",
         "A3"
+    ],
+    dataRangeLabel = [
+        "Coal",
+        "Petroleum",
+        "Natural Gas",
+        "Nuclear",
+        "Hydro",
+        "Biomass",
+        "Wind",
+        "Solar",
+        "Geothermal"
+    ],
+    sliderHandleStyleClass = [
+        "coal",
+        "petroleum",
+        "natural-gas",
+        "nuclear",
+        "hydro",
+        "biomass",
+        "wind",
+        "solar",
+        "geothermal",
+        "geothermal"
     ],
     dataRangeColor = [
         "#404040",
@@ -167,6 +190,10 @@ $.getJSON('https://dl.dropboxusercontent.com/s/3aqbpvn6kar1a87/data.json', funct
     $('#range-slider .noUi-connect').each(function (index) {
         $(this).css('background', dataRangeColor[index]);
     });
+    // add the hexagon class to slider handle
+    $('#range-slider .noUi-tooltip').each(function (index) {
+        $(this).addClass('hexagon').addClass(sliderHandleStyleClass[index]);
+    });
 
 });
 
@@ -188,6 +215,12 @@ Array.prototype.clean = function(deleteValue) {
   return this;
 };
 
+function getHandleValue(values, handle) {
+    if(handle > 0) {
+        return parseInt(Math.round(parseFloat(values[handle]) - parseFloat(values[handle - 1])));
+    }
+    return parseInt(Math.round(parseFloat(values[handle])));
+}
 /**
  * Create multi range slider
  */
@@ -215,7 +248,8 @@ function createMultiRangeSlider(inputRange) {
                 'max': maxRange
             }
         }).on('update', function (values, handle) {
-            $('.noUi-handle[data-handle="' + handle + '"] .noUi-tooltip').text(dataRangeLabel[handle]);
+            $('.noUi-handle[data-handle="' + handle + '"] .noUi-tooltip').text('').html('<p class="noUi-tooltip-text">' + dataRangeLabel[handle] + '</p>');
+            $('.noUi-handle[data-handle="' + handle + '"]').attr('data-before', getHandleValue(values, handle));
             updateRangeSlider(values, handle);
         });
     }
@@ -254,18 +288,21 @@ function initRangeSlider() {
             dataParamByIndex['pa'] = paSum / checkSum;
 
             // values for range slider
-            dataRangeArray[dataRangeLabel.indexOf("CL")] = clPercent;
-            dataRangeArray[dataRangeLabel.indexOf("NG")] = ngPercent;
-            dataRangeArray[dataRangeLabel.indexOf("PA")] = paPercent;
+            dataRangeArray[dataRangeLabelCode.indexOf("CL")] = clPercent;
+            dataRangeArray[dataRangeLabelCode.indexOf("NG")] = ngPercent;
+            dataRangeArray[dataRangeLabelCode.indexOf("PA")] = paPercent;
         } else if (filterDataItemType != "C") {
             dataParamByIndex['r' + filterDataItemType] = parseFloat(filteredDataItem['11']) + parseFloat(filteredDataItem['21']) + parseFloat(filteredDataItem['31']);
             dataParamByIndex['ci' + filterDataItemType] = parseFloat(filteredDataItem['12']) + parseFloat(filteredDataItem['22']) + parseFloat(filteredDataItem['32']);
             dataParamByIndex['t' + filterDataItemType] = parseFloat(filteredDataItem['13']) + parseFloat(filteredDataItem['23']) + parseFloat(filteredDataItem['33']);
 
             // value for range slider
-            dataRangeArray[dataRangeLabel.indexOf(filterDataItemType)] = dataParamByIndex['r' + filterDataItemType] / V32 * 100;
+            dataRangeArray[dataRangeLabelCode.indexOf(filterDataItemType)] = dataParamByIndex['r' + filterDataItemType] / V32 * 100;
         }
     }
+    console.log(dataCubeChart);
+    console.log(dataParamByIndex);
+    console.log(dataRangeArray);
 
     // create range slider
     createMultiRangeSlider(dataRangeArray);
@@ -277,7 +314,7 @@ function initRangeSlider() {
  */
 function updateRangeSlider(values, handle) {
     // update the data
-    var rangeLabel = dataRangeLabel[handle];
+    var rangeLabel = dataRangeLabelCode[handle];
     if(rangeLabel == "CL") {
         dataParamByIndex['cl'] = values[handle];
     } else if(rangeLabel == "PA") {
