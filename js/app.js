@@ -36,7 +36,7 @@ var currentYear = 2014;
 var frustumSize = 1000;
 
 //<-- variables and constants for range slider
-const V32 = 6713924.71096368, V33 = 9220164.67645724, V34 = 6696779.94470847, V35 = 0, W32 = 147694.905991326, W33 = 62164.7495848525, W34 = 63714.9196865604, W35 = 0, X35 = 23244349.8830916, Y35 = 3402810.70215527, Z35 = 1927823.98763521;
+const V32 = 6713924.71096368, V33 = 9220164.67645724, V34 = 6696779.94470847, V35 = 0, W32 = 147694.905991326, W33 = 62164.7495848525, W34 = 63714.9196865604, W35 = 0, X35 = 23244349.8830916, Y35 = 3402810.70215527, Z35 = 1927823.98763521, VIS_VAL_MAX = 10;
 var rA1, rA2, rA3, rA4, rA5, rA6, ciA1, ciA2, ciA3, ciA4, ciA5, ciA6, tA1, tA2, tA3, tA4, tA5, tA6;
 var rangeSlider = 0,
     dataCubeChart = [],
@@ -958,7 +958,7 @@ function fillGraph(name,dataSet,layerNumber) {
         object2.state = dataSet.State;
         object2.year = dataSet.Year;
         var visValue2;
-
+        
         if ( rawValue2 < 1 ) { visValue2 = Math.log(correctionValue)/5 } else { visValue2 = Math.log(rawValue2)/5 }
 
         object2.visValue = visValue2;
@@ -968,6 +968,8 @@ function fillGraph(name,dataSet,layerNumber) {
 
     // heightsGlobal2[layerNumber] = visValue2; // not needed for now
 
+
+    var visValueMax = 0; // maxium of visValue
 
     for (var i = 0; i<3; i++) {
         for (var j = 0; j<3; j++) {
@@ -1015,6 +1017,25 @@ function fillGraph(name,dataSet,layerNumber) {
             object.visValue = visValue;
             object.scale.y = visValue;
 
+            if (visValueMax < visValue) {
+                visValueMax = visValue;
+            }
+            
+        }
+    }
+
+    if (visValueMax > VIS_VAL_MAX) {
+        // if visible value is too large, adjust it
+        var divider4Adjust = visValueMax / VIS_VAL_MAX;
+        for (var i = 0; i < 3; i++) {
+            for (var j = 0; j < 3; j++) {
+                var firstLetter = i + 1;
+                var secondLetter = j + 1;
+                var object = scene.getObjectByName('' + name + '-' + firstLetter + '' + secondLetter + '');
+                var newVisValue = object.visValue / divider4Adjust;
+                object.visValue = newVisValue;
+                object.scale.y = newVisValue;
+            }
         }
     }
     
