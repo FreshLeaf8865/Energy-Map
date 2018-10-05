@@ -45,68 +45,68 @@ var rangeSlider = 0,
         20,  // PA
         30,  // NG
         50, // A6
-        60,  // A4
-        70,  // A5
-        80,  // A2
-        90,  // A1
-        95  // A3
+        60,  // A3
+        70,  // A1
+        80,  // A5
+        90,  // A2
+        95  // A4
     ],
     dataRangeArray = [
         10, // CL
         20,  // PA
         30,  // NG
         50, // A6
-        60,  // A4
-        70,  // A5
-        80,  // A2
-        90,  // A1
-        95  // A3
+        60,  // A3
+        70,  // A1
+        80,  // A5
+        90,  // A2
+        95  // A4
     ],
     dataRangeLabelCode = [
         "CL",
         "PA",
         "NG",
         "A6",
-        "A4",
+        "A3",
+        "A1",
         "A5",
         "A2",
-        "A1",
-        "A3"
+        "A4"
     ],
     dataRangeLabel = [
         "Coal",
         "Petroleum",
         "Natural Gas",
         "Nuclear",
-        "Hydro",
+        "Geothermal",
+        "Solar",
         "Biomass",
         "Wind",
-        "Solar",
-        "Geothermal"
+        "Hydro"
     ],
     sliderHandleStyleClass = [
         "coal",
         "petroleum",
         "natural-gas",
         "nuclear",
-        "hydro",
+        "geothermal",
+        "solar",
         "biomass",
         "wind",
-        "solar",
-        "geothermal",
-        "geothermal"
+        "hydro",
+        "hydro"
     ],
     dataRangeColor = [
         "#404040",
         "#808080",
         "#bfbfbf",
         "#D9444E",
-        "#4E6EB1",
+        "#F77C48",
+        "#FFDB87",
         "#9DD7A5",
         "#3C8FBB",
-        "#FFDB87",
-        "#F77C48",
-        "#F77C48"
+        "#4E6EB1",
+        "#4E6EB1"
     ],
     dataParamByIndex = {
         "rA1": 0,
@@ -846,7 +846,8 @@ function onDocumentMouseMove(event) {
         // console.log('tower index: ',towerName, 'tower total value: ',totalSum); // Helps better understand what tower type is hovered and its sum
 
         // $('#popup').html('<b>'+INTERSECTED.state+'</b> '+verb+' <b>'+INTERSECTED.value+'</b> Quads of <b>'+energyType+'</b> energy<b>'+sectorType+', out of <b>'+totalSum+'</b> Quads total, in <b>'+INTERSECTED.year+'</b> year<br>Some additional text here<br>Link: <a href="">You cant click this link :D</a>'); //show some data in popup window on intersection
-        $('#popup').html('<b>'+stateName+'</b> '+verb+' <b>'+INTERSECTED.value+'</b> Quads of <b>'+energyType+'</b> energy<b>'+sectorType+', out of <b>'+totalSum+'</b> Quads total, in <b>'+INTERSECTED.year+'</b> year<br>Some additional text here<br>Link: <a href="">You cant click this link :D</a>'); //show some data in popup window on intersection
+        // $('#popup').html('<b>'+stateName+'</b> '+verb+' <b>'+INTERSECTED.value+'</b> Quads of <b>'+energyType+'</b> energy<b>'+sectorType+', out of <b>'+totalSum+'</b> Quads total, in <b>'+INTERSECTED.year+'</b> year<br>Some additional text here<br>Link: <a href="">You cant click this link :D</a>'); //show some data in popup window on intersection
+        $('#popup').html('<b>Kansas City</b> ' + verb + ' <b>' + INTERSECTED.value +'</b> mm BTU of <b>'+energyType+'</b> energy<b>'+sectorType+', out of <b>'+totalSum+'</b> Quads total, in <b>'+INTERSECTED.year+'</b> year<br>Some additional text here<br>Link: <a href="">You cant click this link :D</a>'); //show some data in popup window on intersection
         $('#popup').fadeIn(300);
         $('#popup').css('left',''+popupX+'px');
         $('#popup').css('top',''+popupY+'px');
@@ -1253,6 +1254,15 @@ $('.filter-item2').click(function(){
 
 });
 
+$('.filter-item3').click(function () {
+    if ($(this).hasClass('on')) {
+        $(this).removeClass('on').addClass('off');
+        $('.range-slider-wrapper').addClass('hidden');
+    } else {
+        $(this).removeClass('off').addClass('on');
+        $('.range-slider-wrapper').removeClass('hidden');
+    }
+});
 
 
 
@@ -1263,9 +1273,10 @@ $('.filter-item2').click(function(){
 
 
 
-simplemaps_usmap.hooks.click_state=function(id){
-    stateId = id;
-    stateName = simplemaps_usmap_mapdata.state_specific[id].name;
-    changeData(currentYear);
-    console.log('Changed state: ',id,'Current year: ',currentYear);
-}
+
+// simplemaps_usmap.hooks.click_state=function(id){
+//     stateId = id;
+//     stateName = simplemaps_usmap_mapdata.state_specific[id].name;
+//     changeData(currentYear);
+//     console.log('Changed state: ',id,'Current year: ',currentYear);
+// }
