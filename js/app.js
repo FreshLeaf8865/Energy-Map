@@ -36,7 +36,7 @@ var currentYear = 2014;
 var frustumSize = 1000;
 
 //<-- variables and constants for range slider
-const V32 = 6713924.71096368, V33 = 9220164.67645724, V34 = 6696779.94470847, V35 = 0, W32 = 147694.905991326, W33 = 62164.7495848525, W34 = 63714.9196865604, W35 = 0, X35 = 23244349.8830916, Y35 = 3402810.70215527, Z35 = 1927823.98763521, VIS_VAL_MAX = 10;
+const V32 = 6713924.71096368, V33 = 9220164.67645724, V34 = 6696779.94470847, V35 = 0, W32 = 147694.905991326, W33 = 62164.7495848525, W34 = 63714.9196865604, W35 = 0, X35 = 23244349.8830916, Y35 = 3402810.70215527, Z35 = 1927823.98763521, VIS_VAL_MAX = 4.25;
 var rA1, rA2, rA3, rA4, rA5, rA6, ciA1, ciA2, ciA3, ciA4, ciA5, ciA6, tA1, tA2, tA3, tA4, tA5, tA6;
 var rangeSlider = 0,
     dataCubeChart = [],
@@ -215,6 +215,10 @@ Array.prototype.clean = function(deleteValue) {
   return this;
 };
 
+var getParamIndex = function (paramName) {
+    return dataParamByIndex[paramName];
+};
+
 function getHandleValue(values, handle) {
     if(handle > 0) {
         return parseInt(Math.round(parseFloat(values[handle]) - parseFloat(values[handle - 1])));
@@ -267,20 +271,20 @@ function initRangeSlider() {
             clPercent = parseFloat(filteredDataItem['11']) / V32 * 100;
             ngPercent = (parseFloat(filteredDataItem['21']) - W32) / V32 * 100;
             paPercent = parseFloat(filteredDataItem['31']) / V32 * 100;
-
+            
             var c13 = parseFloat(filteredDataItem['11']),
-                d13 = clPercent * (W33 + W34),
-                e13 = clPercent * V35,
-                clSum = c13 + d13 + e13,
-                f13 = ngPercent * V32,
-                g13 = ngPercent * (V33 + V34),
-                h13 = ngPercent * V35,
-                ngSum = f13 + g13 + h13,
-                i13 = paPercent * V32,
-                j13 = paPercent * (V33 + V34);
+            d13 = clPercent * (W33 + W34) / 100,
+            e13 = clPercent * V35 / 100,
+            clSum = c13 + d13 + e13,
+            f13 = ngPercent * V32 / 100,
+            g13 = ngPercent * (V33 + V34) / 100,
+            h13 = ngPercent * V35 / 100,
+            ngSum = f13 + g13 + h13,
+            i13 = paPercent * V32 / 100,
+            j13 = paPercent * (V33 + V34) / 100;
             k13 = paPercent * V35,
-                paSum = i13 + j13 + k13,
-                checkSum = clSum + ngSum + paSum;
+            paSum = i13 + j13 + k13,
+            checkSum = clSum + ngSum + paSum;
 
             // values for calculating
             dataParamByIndex['cl'] = clSum / checkSum;
@@ -292,12 +296,15 @@ function initRangeSlider() {
             dataRangeArray[dataRangeLabelCode.indexOf("NG")] = ngPercent;
             dataRangeArray[dataRangeLabelCode.indexOf("PA")] = paPercent;
         } else if (filterDataItemType != "C") {
-            dataParamByIndex['r' + filterDataItemType] = parseFloat(filteredDataItem['11']) + parseFloat(filteredDataItem['21']) + parseFloat(filteredDataItem['31']);
-            dataParamByIndex['ci' + filterDataItemType] = parseFloat(filteredDataItem['12']) + parseFloat(filteredDataItem['22']) + parseFloat(filteredDataItem['32']);
-            dataParamByIndex['t' + filterDataItemType] = parseFloat(filteredDataItem['13']) + parseFloat(filteredDataItem['23']) + parseFloat(filteredDataItem['33']);
+            var rVal = parseFloat(filteredDataItem['11']) + parseFloat(filteredDataItem['21']) + parseFloat(filteredDataItem['31']),
+                ciVal = parseFloat(filteredDataItem['12']) + parseFloat(filteredDataItem['22']) + parseFloat(filteredDataItem['32']),
+                tVal = parseFloat(filteredDataItem['13']) + parseFloat(filteredDataItem['23']) + parseFloat(filteredDataItem['33']);
+            dataParamByIndex["r" + filterDataItemType] = rVal;
+            dataParamByIndex["ci" + filterDataItemType] = ciVal;
+            dataParamByIndex["t" + filterDataItemType] = tVal;
 
             // value for range slider
-            dataRangeArray[dataRangeLabelCode.indexOf(filterDataItemType)] = dataParamByIndex['r' + filterDataItemType] / V32 * 100;
+            dataRangeArray[dataRangeLabelCode.indexOf(filterDataItemType)] = getParamIndex("r" + filterDataItemType) / V32 * 100;
         }
     }
     console.log(dataCubeChart);
@@ -314,13 +321,16 @@ function initRangeSlider() {
  */
 function updateRangeSlider(values, handle) {
     // update the data
-    var rangeLabel = dataRangeLabelCode[handle];
+    var rangeLabel = dataRangeLabelCode[handle],
+    clParam = dataRangeArray[dataRangeLabelCode.indexOf("CL")],
+    ngParam = dataRangeArray[dataRangeLabelCode.indexOf("NG")],
+    paParam = dataRangeArray[dataRangeLabelCode.indexOf("PA")];
     if(rangeLabel == "CL") {
-        dataParamByIndex['cl'] = values[handle];
+        clParam = values[handle];
     } else if(rangeLabel == "PA") {
-        dataParamByIndex['pa'] = values[handle];
+        paParam = values[handle];
     } else if(rangeLabel == "NG") {
-        dataParamByIndex['ng'] = values[handle];
+        ngParam = values[handle];
     } else {
         dataParamByIndex['r' + rangeLabel] = values[handle] * V32 / 100;
         dataParamByIndex['ci' + rangeLabel] = values[handle] * (V33 + V34) / 100;
@@ -333,20 +343,20 @@ function updateRangeSlider(values, handle) {
         var updatedDataItem = {}, updatedDataItemType = dataCubeChart[i].Type;
 
         if (updatedDataItemType == "B") {
-            updatedDataItem['11'] = String(dataParamByIndex['cl'] * V32 / 100);
-            updatedDataItem['12'] = String((dataParamByIndex['cl'] * (V33 + V34)) / 100);
-            updatedDataItem['13'] = String((dataParamByIndex['cl'] * V35) / 100);
-            updatedDataItem['21'] = String(((dataParamByIndex['ng'] * V32) + W32) / 100);
-            updatedDataItem['22'] = String(((W33 + W34) + ((dataParamByIndex['ng'] * (V33 + V34)))) / 100);
-            updatedDataItem['23'] = String(((dataParamByIndex['ng'] * V35) + W35) / 100);
-            updatedDataItem['31'] = String(dataParamByIndex['pa'] * V32 / 100);
-            updatedDataItem['32'] = String(dataParamByIndex['pa'] * (V33 + V34) / 100);
-            updatedDataItem['33'] = String(((dataParamByIndex['pa'] * V35) + (X35 + Y35 + Z35)) / 100);
+            updatedDataItem['11'] = String(clParam * V32 / 100);
+            updatedDataItem['12'] = String((clParam * (V33 + V34)) / 100);
+            updatedDataItem['13'] = String((clParam * V35) / 100);
+            updatedDataItem['21'] = String(((ngParam * V32) / 100) + W32);
+            updatedDataItem['22'] = String(((W33 + W34) + ((ngParam * (V33 + V34) / 100))));
+            updatedDataItem['23'] = String(((ngParam * V35 / 100) + W35));
+            updatedDataItem['31'] = String(paParam * V32 / 100);
+            updatedDataItem['32'] = String(paParam * (V33 + V34) / 100);
+            updatedDataItem['33'] = String(((paParam * V35 / 100) + (X35 + Y35 + Z35)));
         } else if (updatedDataItemType != "C") {
             for (var j = 1; j <= 3; j++) {
-                updatedDataItem[j + '1'] = String(dataParamByIndex['r' + updatedDataItemType] * dataParamByIndex['cl'] * 100);
-                updatedDataItem[j + '2'] = String(dataParamByIndex['ci' + updatedDataItemType] * dataParamByIndex['cl'] * 100);
-                updatedDataItem[j + '3'] = String(dataParamByIndex['t' + updatedDataItemType] * dataParamByIndex['cl'] * 100);
+                updatedDataItem[j + '1'] = String(getParamIndex('r' + updatedDataItemType) * getParamIndex('cl'));
+                updatedDataItem[j + '2'] = String(getParamIndex('ci' + updatedDataItemType) * getParamIndex('cl'));
+                updatedDataItem[j + '3'] = String(getParamIndex('t' + updatedDataItemType) * getParamIndex('cl'));
             }
         } else {
             for (var j = 1; j <= 3; j++) {
@@ -366,6 +376,7 @@ function updateRangeSlider(values, handle) {
     for (var i = 0; i < 8; i++) {
         layer[i] = [];
     }
+    console.log(updatedData);
 
     for (var i = 0; i < updatedDataLen; i++) {
         fillGraph(updatedData[i].Type, updatedData[i], i);
