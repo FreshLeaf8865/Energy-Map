@@ -73,6 +73,17 @@ var rangeSlider = 0,
         "A2",
         "A4"
     ],
+    handleInited = [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+    ],
     dataRangeLabel = [
         "Coal",
         "Petroleum",
@@ -219,11 +230,17 @@ var getParamIndex = function (paramName) {
     return dataParamByIndex[paramName];
 };
 
-function getHandleValue(values, handle) {
+function getHandleValue(values, handle, isInt) {
+    var result = parseFloat(values[handle]);
     if(handle > 0) {
-        return parseInt(Math.round(parseFloat(values[handle]) - parseFloat(values[handle - 1])));
+        result = parseFloat(values[handle]) - parseFloat(values[handle - 1]);
     }
-    return parseInt(Math.round(parseFloat(values[handle])));
+
+    if (isInt) {
+        return parseInt(Math.round(result));
+    } else {
+        return result;
+    }
 }
 /**
  * Create multi range slider
@@ -253,7 +270,7 @@ function createMultiRangeSlider(inputRange) {
             }
         }).on('update', function (values, handle) {
             $('.noUi-handle[data-handle="' + handle + '"] .noUi-tooltip').text('').html('<p class="noUi-tooltip-text">' + dataRangeLabel[handle] + '</p>');
-            $('.noUi-handle[data-handle="' + handle + '"]').attr('data-before', getHandleValue(values, handle));
+            $('.noUi-handle[data-handle="' + handle + '"]').attr('data-before', getHandleValue(values, handle, true));
             updateRangeSlider(values, handle);
         });
     }
@@ -320,21 +337,30 @@ function initRangeSlider() {
  * @param {*} handle index
  */
 function updateRangeSlider(values, handle) {
+    // check if it is slider initialization
+    if(!handleInited[handle]) {
+        handleInited[handle] = true;
+    }
+    for(var i = 0; i < handleInited.length; i++) {
+        if (!handleInited[i]) {
+            return;
+        }
+    }
     // update the data
     var rangeLabel = dataRangeLabelCode[handle],
     clParam = dataRangeArray[dataRangeLabelCode.indexOf("CL")],
     ngParam = dataRangeArray[dataRangeLabelCode.indexOf("NG")],
     paParam = dataRangeArray[dataRangeLabelCode.indexOf("PA")];
     if(rangeLabel == "CL") {
-        clParam = values[handle];
+        clParam = getHandleValue(values, handle, false);
     } else if(rangeLabel == "PA") {
-        paParam = values[handle];
+        paParam = getHandleValue(values, handle, false);
     } else if(rangeLabel == "NG") {
-        ngParam = values[handle];
+        ngParam = getHandleValue(values, handle, false);
     } else {
-        dataParamByIndex['r' + rangeLabel] = values[handle] * V32 / 100;
-        dataParamByIndex['ci' + rangeLabel] = values[handle] * (V33 + V34) / 100;
-        dataParamByIndex['t' + rangeLabel] = values[handle] * V35 / 100;
+        dataParamByIndex['r' + rangeLabel] = getHandleValue(values, handle, false) * V32 / 100;
+        dataParamByIndex['ci' + rangeLabel] = getHandleValue(values, handle, false) * (V33 + V34) / 100;
+        dataParamByIndex['t' + rangeLabel] = getHandleValue(values, handle, false) * V35 / 100;
     }
 
     // generate data from slider changes
@@ -847,7 +873,7 @@ function onDocumentMouseMove(event) {
 
         // $('#popup').html('<b>'+INTERSECTED.state+'</b> '+verb+' <b>'+INTERSECTED.value+'</b> Quads of <b>'+energyType+'</b> energy<b>'+sectorType+', out of <b>'+totalSum+'</b> Quads total, in <b>'+INTERSECTED.year+'</b> year<br>Some additional text here<br>Link: <a href="">You cant click this link :D</a>'); //show some data in popup window on intersection
         // $('#popup').html('<b>'+stateName+'</b> '+verb+' <b>'+INTERSECTED.value+'</b> Quads of <b>'+energyType+'</b> energy<b>'+sectorType+', out of <b>'+totalSum+'</b> Quads total, in <b>'+INTERSECTED.year+'</b> year<br>Some additional text here<br>Link: <a href="">You cant click this link :D</a>'); //show some data in popup window on intersection
-        $('#popup').html('<b>Kansas City</b> ' + verb + ' <b>' + INTERSECTED.value +'</b> mm BTU of <b>'+energyType+'</b> energy<b>'+sectorType+', out of <b>'+totalSum+'</b> Quads total, in <b>'+INTERSECTED.year+'</b> year<br>Some additional text here<br>Link: <a href="">You cant click this link :D</a>'); //show some data in popup window on intersection
+        $('#popup').html('<b>Kansas City</b> ' + verb + ' <b>' + INTERSECTED.value +'</b> mm BTU of <b>'+energyType+'</b> energy<b>'+sectorType+', out of <b>'+totalSum+'</b> mm BTUs total, in <b>'+INTERSECTED.year+'</b> year<br>Some additional text here<br>Link: <a href="">You cant click this link :D</a>'); //show some data in popup window on intersection
         $('#popup').fadeIn(300);
         $('#popup').css('left',''+popupX+'px');
         $('#popup').css('top',''+popupY+'px');
@@ -966,6 +992,8 @@ function fillGraph(name,dataSet,layerNumber) {
 
         var object2 = scene.getObjectByName( name );
         var rawValue2 = parseInt(dataSet['11'])+parseInt(dataSet['12'])+parseInt(dataSet['13'])+parseInt(dataSet['21'])+parseInt(dataSet['22'])+parseInt(dataSet['23'])+parseInt(dataSet['31'])+parseInt(dataSet['32'])+parseInt(dataSet['33']);
+        console.log('dataSet', dataSet);
+        console.log('object name', name);
         object2.value = Math.round(rawValue2);
         object2.state = dataSet.State;
         object2.year = dataSet.Year;
