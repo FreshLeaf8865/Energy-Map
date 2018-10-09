@@ -269,8 +269,11 @@ function createMultiRangeSlider(inputRange) {
                 'max': maxRange
             }
         }).on('update', function (values, handle) {
-            $('.noUi-handle[data-handle="' + handle + '"] .noUi-tooltip').text('').html('<p class="noUi-tooltip-text">' + dataRangeLabel[handle] + '</p>');
-            $('.noUi-handle[data-handle="' + handle + '"]').attr('data-before', getHandleValue(values, handle, true));
+            var handles = values.length;
+            for(var i = 0; i < handles; i++) {
+                $('.noUi-handle[data-handle="' + i + '"] .noUi-tooltip').text('').html('<p class="noUi-tooltip-text">' + dataRangeLabel[i] + '</p>');
+                $('.noUi-handle[data-handle="' + i + '"]').attr('data-before', getHandleValue(values, i, true));
+            }
             updateRangeSlider(values, handle);
         });
     }
@@ -402,13 +405,52 @@ function updateRangeSlider(values, handle) {
     for (var i = 0; i < 8; i++) {
         layer[i] = [];
     }
-    console.log(updatedData);
+    // console.log(updatedData);
 
     for (var i = 0; i < updatedDataLen; i++) {
         fillGraph(updatedData[i].Type, updatedData[i], i);
     }
     updateGraphVisually();
 
+}
+/**
+ * jQuery plugin to add comma to numbers every three digits
+ */
+$.fn.digits = function () {
+    return this.each(function () {
+        $(this).text($(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+    })
+}
+/**
+ * Show the total energy sum of cubes are visible currently
+ */
+function showTotalEnergySum() {
+    var sum = 0;
+    for (var i = graph.length - 1; i >= 0; i--) {
+        if (graph[i].visible == true && graph[i].name.indexOf("-") >= 0) {
+            sum += graph[i].value;
+        }
+    }
+    $(".total_energy_sum").text(sum).digits();
+}
+/**
+ * Switch filter item
+ */
+function switchFilterItem() {
+    var checkBox = document.getElementById("switch-filter-item");
+    $('.filter-item').each(function (index) {
+        if (checkBox.checked == true) {
+            $(this).removeClass('off').addClass('on');
+        } else {
+            $(this).removeClass('on').addClass('off');
+        }
+    });
+
+    for (var i = graph.length - 1; i >= 0; i--) {
+        graph[i].visible = checkBox.checked;
+    }
+
+    showTotalEnergySum();
 }
 
 function init() {
@@ -992,8 +1034,6 @@ function fillGraph(name,dataSet,layerNumber) {
 
         var object2 = scene.getObjectByName( name );
         var rawValue2 = parseInt(dataSet['11'])+parseInt(dataSet['12'])+parseInt(dataSet['13'])+parseInt(dataSet['21'])+parseInt(dataSet['22'])+parseInt(dataSet['23'])+parseInt(dataSet['31'])+parseInt(dataSet['32'])+parseInt(dataSet['33']);
-        console.log('dataSet', dataSet);
-        console.log('object name', name);
         object2.value = Math.round(rawValue2);
         object2.state = dataSet.State;
         object2.year = dataSet.Year;
@@ -1078,6 +1118,8 @@ function fillGraph(name,dataSet,layerNumber) {
             }
         }
     }
+
+    showTotalEnergySum();
     
 }
 
@@ -1248,24 +1290,26 @@ $('.filter-item').click(function(){
         $(this).addClass('on');
 
         for (var i = graph.length - 1; i >= 0; i--) {
-            if( graph[i].energyType == clickedId ) {
+            if (graph[i].energyType == clickedId && ((graph[i].name.indexOf("-") >= 0 && $('#filter-item2-' + graph[i].name.slice(-1)).hasClass('on'))) ) {
                 graph[i].visible = true;
             }
         }
     }
 
+    showTotalEnergySum();
+
 });
 
 $('.filter-item2').click(function(){
 
-    var clickedId = $(this).attr('id');
+    var clickedId = $(this).attr('id').slice(-1);
 
     if ( $(this).hasClass('on') ) {
         $(this).removeClass('on');
         $(this).addClass('off');
 
         for (var i = graph.length - 1; i >= 0; i--) {
-            if( ( graph[i].name.slice(-3) == '-1'+clickedId || graph[i].name.slice(-3) == '-2'+clickedId || graph[i].name.slice(-3) == '-3'+clickedId ) ) {
+            if ((graph[i].name.slice(-3) == '-1' + clickedId || graph[i].name.slice(-3) == '-2' + clickedId || graph[i].name.slice(-3) == '-3' + clickedId)) {
                 graph[i].visible = false;
             }
         }
@@ -1274,11 +1318,13 @@ $('.filter-item2').click(function(){
         $(this).addClass('on');
 
         for (var i = graph.length - 1; i >= 0; i--) {
-            if( ( graph[i].name.slice(-3) == '-1'+clickedId || graph[i].name.slice(-3) == '-2'+clickedId || graph[i].name.slice(-3) == '-3'+clickedId ) ) {
+            if ((graph[i].name.slice(-3) == '-1' + clickedId || graph[i].name.slice(-3) == '-2' + clickedId || graph[i].name.slice(-3) == '-3' + clickedId) && $('#' + graph[i].energyType).hasClass('on') ) {
                 graph[i].visible = true;
             }
         }
     }
+
+    showTotalEnergySum();
 
 });
 

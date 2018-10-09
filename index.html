@@ -45,6 +45,13 @@
     </div>
     <div class="data_type cont">
         <div class="hdr" id="front">Filter by energy type</div>
+        <div class="switch-filter-item-wrapper">
+          <label class="switch">
+            <input type="checkbox" id="switch-filter-item" onclick="switchFilterItem()" checked>
+            <span class="slider round"></span>
+          </label>
+          <span class="switch-filter-item-label">Show/Hide All</span>
+        </div>
         <div class="filter-item on" id="Nuclear"><img src="img/icon_nuclear.png"></div>
         <div class="filter-item on" id="Geothermal"><img src="img/icon_geo.png"></div>
         <div class="filter-item on" id="Solar"><img src="img/icon_solar.png"></div>
@@ -56,9 +63,9 @@
         <div class="filter-item on" id="Natural Gas"><img src="img/icon_naturalgas.png"></div>
         <div class="filter-item on" id="waste"><img src="img/icon_inefficiences.png"></div>
         <div class="hdr" id="front">Filter by sector</div>
-        <div class="filter-item2 on" id="1"><img src="img/icon_home.png"></div>
-        <div class="filter-item2 on" id="2"><img src="img/icon_business.png"></div>
-        <div class="filter-item2 on" id="3"><img src="img/icon_transportation.png"></div>
+        <div class="filter-item2 on" id="filter-item2-1"><img src="img/icon_home.png"></div>
+        <div class="filter-item2 on" id="filter-item2-2"><img src="img/icon_business.png"></div>
+        <div class="filter-item2 on" id="filter-item2-3"><img src="img/icon_transportation.png"></div>
         <div class="filter-item3 on"><img src="img/icon_electricity.png"></div>
     </div>
     <div class="data_mode">
@@ -95,6 +102,7 @@
           </li>
         </ul>
     </div>
+    <p class="total_energy_sum">0</p>
     <div class="range-slider-wrapper">
       <div id="range-slider"></div>
     </div>
