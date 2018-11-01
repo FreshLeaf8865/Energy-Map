@@ -458,12 +458,14 @@ function init() {
     container = document.getElementById( 'canvas' );
 
     var aspect = window.innerWidth / window.innerHeight;
-    camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 10000 );
+    // camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 10000 );
+    var d = 60;
+    camera = new THREE.OrthographicCamera(- d * aspect, d * aspect, d, - d, 1, 1000);
     // camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 2000 );
                 
-    camera.position.set( 0,50,100 );
+    camera.position.set( 60,60,60 );
 
-    cameraTarget = new THREE.Vector3( 0, 30, 0 );
+    cameraTarget = new THREE.Vector3( 0, 0, 0 );
 
     scene = new THREE.Scene();
     ///scene.background = new THREE.Color( 0x72645b );
@@ -915,7 +917,7 @@ function onDocumentMouseMove(event) {
 
         // $('#popup').html('<b>'+INTERSECTED.state+'</b> '+verb+' <b>'+INTERSECTED.value+'</b> Quads of <b>'+energyType+'</b> energy<b>'+sectorType+', out of <b>'+totalSum+'</b> Quads total, in <b>'+INTERSECTED.year+'</b> year<br>Some additional text here<br>Link: <a href="">You cant click this link :D</a>'); //show some data in popup window on intersection
         // $('#popup').html('<b>'+stateName+'</b> '+verb+' <b>'+INTERSECTED.value+'</b> Quads of <b>'+energyType+'</b> energy<b>'+sectorType+', out of <b>'+totalSum+'</b> Quads total, in <b>'+INTERSECTED.year+'</b> year<br>Some additional text here<br>Link: <a href="">You cant click this link :D</a>'); //show some data in popup window on intersection
-        $('#popup').html('<b>Kansas City</b> ' + verb + ' <b>' + INTERSECTED.value +'</b> mm BTU of <b>'+energyType+'</b> energy<b>'+sectorType+', out of <b>'+totalSum+'</b> mm BTUs total, in <b>'+INTERSECTED.year+'</b> year<br>Some additional text here<br>Link: <a href="">You cant click this link :D</a>'); //show some data in popup window on intersection
+        $('#popup').html('<b>Kansas City</b> ' + verb + ' <b>' + INTERSECTED.value + '</b> mm BTU of <b>' + energyType + '</b> energy<b>' + sectorType + ', out of <b>' + totalSum + '</b> mm BTUs total, in <b>' + INTERSECTED.year + '</b> year<br>Some additional text here<br>Link: <a href="">You cant click this link :D</a>'); //show some data in popup window on intersection
         $('#popup').fadeIn(300);
         $('#popup').css('left',''+popupX+'px');
         $('#popup').css('top',''+popupY+'px');
@@ -998,7 +1000,7 @@ function fillGraph(name,dataSet,layerNumber) {
         object00.year = dataSet.Year;
         var visValue2;
 
-        if ( rawValue2 < 1 ) { visValue2 = Math.log(correctionValue)/5 } else { visValue2 = Math.log(rawValue2)/5 }
+        if ( rawValue2 < 1 ) { visValue2 = Math.log(correctionValue) } else { visValue2 = Math.log(rawValue2) }
 
         object00.visValue = visValue2;
         object00.scale.y = visValue2;
@@ -1011,7 +1013,7 @@ function fillGraph(name,dataSet,layerNumber) {
         object01.year = dataSet.Year;
         var visValue2;
 
-        if ( rawValue2 < 1 ) { visValue2 = Math.log(correctionValue)/5 } else { visValue2 = Math.log(rawValue2)/5 }
+        if ( rawValue2 < 1 ) { visValue2 = Math.log(correctionValue) } else { visValue2 = Math.log(rawValue2)}
 
         object01.visValue = visValue2;
         object01.scale.y = visValue2;
@@ -1025,7 +1027,7 @@ function fillGraph(name,dataSet,layerNumber) {
         object02.year = dataSet.Year;
         var visValue2;
 
-        if ( rawValue2 < 1 ) { visValue2 = Math.log(correctionValue)/5 } else { visValue2 = Math.log(rawValue2)/5 }
+        if ( rawValue2 < 1 ) { visValue2 = Math.log(correctionValue) } else { visValue2 = Math.log(rawValue2) }
 
         object02.visValue = visValue2;
         object02.scale.y = visValue2;
@@ -1039,7 +1041,7 @@ function fillGraph(name,dataSet,layerNumber) {
         object2.year = dataSet.Year;
         var visValue2;
         
-        if ( rawValue2 < 1 ) { visValue2 = Math.log(correctionValue)/5 } else { visValue2 = Math.log(rawValue2)/5 }
+        if ( rawValue2 < 1 ) { visValue2 = Math.log(correctionValue) } else { visValue2 = Math.log(rawValue2) }
 
         object2.visValue = visValue2;
         object2.scale.y = visValue2;
