@@ -1,110 +1,117 @@
 <!DOCTYPE html>
 <head>
-    <title>Energy visualization</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <link href='https://fonts.googleapis.com/css?family=Roboto:100,400,300,500,700' rel='stylesheet' type='text/css'>
-    <script type="text/javascript" src="js/jquery.min.js"></script>
-    <script src="js/three.js"></script>
-    <script src="js/OBJLoader.js"></script>
-    <script src="js/stats.min.js"></script>
-    <script src="js/Detector.js"></script>
-    <script src="js/STLLoader.js"></script>
-    <script src="js/OrbitControls.js"></script>
-    <script src="js/tween.js"></script>
-    
-    <script src="js/mapdata.js"></script>
-    <!-- <script src="js/usmap.js"></script> -->
-    
-    <!--     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script> -->
-    
-    <link rel="stylesheet" href="css/material.css">
-    <script src="js/material.min.js"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="css/nouislider.css">
-    <link rel="stylesheet" href="css/style.css">
-    <script src="js/nouislider.js"></script>
-
-
+  <title>Energy visualization</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <link href='https://fonts.googleapis.com/css?family=Roboto:100,400,300,500,700' rel='stylesheet' type='text/css'>
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+  <script src="js/three.js"></script>
+  <script src="js/OBJLoader.js"></script>
+  <script src="js/stats.min.js"></script>
+  <script src="./lib/bower_components/subunit/demos/bower_components/d3/d3.js"></script>
+  <script src="js/Detector.js"></script>
+  <script src="js/STLLoader.js"></script>
+  <script src="js/OrbitControls.js"></script>
+  <script src="js/tween.js"></script>
+  <script src="./lib/threejs/examples/js/controls/TrackballControls.js"></script>
+  <script src="./lib/bower_components/subunit/dist/subunit.js"></script>
+  <script src="js/mapdata.js"></script>
+  <!-- <script src="js/usmap.js"></script> -->
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script> -->
+  
+  <link rel="stylesheet" href="css/material.css">
+  <script src="js/material.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="css/nouislider.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/nouislider.js"></script>
 </head>
 <body>
-    <div class="img_logo"><img src="img/logo.png"></div>
-    <div class="logo">Energy Data</div>
-    <div id="canvas"></div>
-    <!-- <div class="controls cont">
-        <div class="hdr" id="front">Select region</div>
-        <div id="map"></div>
-    </div> -->
-    <div class="popup" id="popup">
-        SOME INFO
+  <div class="img_logo"><img src="img/logo.png"></div>
+  <div class="logo">Energy Data</div>
+  <div id="canvas"></div>
+  <!-- <div class="controls cont">
+      <div class="hdr" id="front">Select region</div>
+      <div id="map"></div>
+  </div> -->
+  <div class="popup" id="popup">
+    SOME INFO
+  </div>
+  <div class="filter_container cont">
+    <div class="hdr" id="front">Select year</div>
+    <span class="value" id="slider1-value"></span>
+    <input class="slider mdl-slider mdl-js-slider" id="1" type="range" min="1960" max="2010" value="2010" tabindex="0">      
+  </div>
+  <div class="data_type cont">
+    <div class="hdr" id="front">Filter by energy type</div>
+    <div class="switch-filter-item-wrapper">
+      <label class="switch">
+        <input type="checkbox" id="switch-filter-item" onclick="switchFilterItem()" checked>
+        <span class="slider-switch round"></span>
+      </label>
+      <span class="switch-filter-item-label">Show/Hide All</span>
     </div>
-    <div class="filter_container cont">
-        <div class="hdr" id="front">Select year</div>
-        <span class="value" id="slider1-value"></span>
-        <input class="slider mdl-slider mdl-js-slider" id="1" type="range" min="1960" max="2010" value="2010" tabindex="0">      
-    </div>
-    <div class="data_type cont">
-        <div class="hdr" id="front">Filter by energy type</div>
-        <div class="switch-filter-item-wrapper">
-          <label class="switch">
-            <input type="checkbox" id="switch-filter-item" onclick="switchFilterItem()" checked>
-            <span class="slider-switch round"></span>
+    <div class="filter-item on" id="Nuclear"><img src="img/icon_nuclear.png"></div>
+    <div class="filter-item on" id="Geothermal"><img src="img/icon_geo.png"></div>
+    <div class="filter-item on" id="Solar"><img src="img/icon_solar.png"></div>
+    <div class="filter-item on" id="Biofuel"><img src="img/icon_bio.png"></div>
+    <div class="filter-item on" id="Wind"><img src="img/icon_wind.png"></div>
+    <div class="filter-item on" id="Hydro"><img src="img/icon_hydro.png"></div>
+    <div class="filter-item on" id="Coal"><img src="img/icon_coal.png"></div>
+    <div class="filter-item on" id="Petroleum"><img src="img/icon_petroleum.png"></div>
+    <div class="filter-item on" id="Natural Gas"><img src="img/icon_naturalgas.png"></div>
+    <div class="filter-item on" id="waste"><img src="img/icon_inefficiences.png"></div>
+    <div class="hdr" id="front">Filter by sector</div>
+    <div class="filter-item2 on" id="filter-item2-1"><img src="img/icon_home.png"></div>
+    <div class="filter-item2 on" id="filter-item2-2"><img src="img/icon_business.png"></div>
+    <div class="filter-item2 on" id="filter-item2-3"><img src="img/icon_transportation.png"></div>
+    <div class="filter-item3 on"><img src="img/icon_electricity.png"></div>
+  </div>
+  <div class="data_mode">
+    <ul class="demo-list-control mdl-list">
+      <li class="mdl-list__item">
+        <span class="dark_mode mdl-list__item-primary-content">
+          Full 3D mode
+        </span>
+        <span class="mdl-list__item-secondary-action">
+          <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
+            <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked/>
           </label>
-          <span class="switch-filter-item-label">Show/Hide All</span>
-        </div>
-        <div class="filter-item on" id="Nuclear"><img src="img/icon_nuclear.png"></div>
-        <div class="filter-item on" id="Geothermal"><img src="img/icon_geo.png"></div>
-        <div class="filter-item on" id="Solar"><img src="img/icon_solar.png"></div>
-        <div class="filter-item on" id="Biofuel"><img src="img/icon_bio.png"></div>
-        <div class="filter-item on" id="Wind"><img src="img/icon_wind.png"></div>
-        <div class="filter-item on" id="Hydro"><img src="img/icon_hydro.png"></div>
-        <div class="filter-item on" id="Coal"><img src="img/icon_coal.png"></div>
-        <div class="filter-item on" id="Petroleum"><img src="img/icon_petroleum.png"></div>
-        <div class="filter-item on" id="Natural Gas"><img src="img/icon_naturalgas.png"></div>
-        <div class="filter-item on" id="waste"><img src="img/icon_inefficiences.png"></div>
-        <div class="hdr" id="front">Filter by sector</div>
-        <div class="filter-item2 on" id="filter-item2-1"><img src="img/icon_home.png"></div>
-        <div class="filter-item2 on" id="filter-item2-2"><img src="img/icon_business.png"></div>
-        <div class="filter-item2 on" id="filter-item2-3"><img src="img/icon_transportation.png"></div>
-        <div class="filter-item3 on"><img src="img/icon_electricity.png"></div>
+        </span>
+      </li>
+      <li class="mdl-list__item">
+        <span class="dark_mode mdl-list__item-primary-content">
+          3D simplified
+        </span>
+        <span class="mdl-list__item-secondary-action">
+          <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-2">
+            <input type="radio" id="list-option-2" class="mdl-radio__button" name="options" value="2"/>
+          </label>
+        </span>
+      </li>
+      <li class="mdl-list__item">
+        <span class="dark_mode mdl-list__item-primary-content">
+          Full 2D mode
+        </span>
+        <span class="mdl-list__item-secondary-action">
+          <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-3">
+            <input type="radio" id="list-option-3" class="mdl-radio__button" name="options" value="3"/>
+          </label>
+        </span>
+      </li>
+    </ul>
+  </div>
+  <p class="total_energy_sum">0</p>
+  <div class="range-slider-wrapper">
+    <div id="range-slider"></div>
+  </div>
+  <!-- TreeMap Modal -->
+  <div id="treeMapPopUp" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+      <span onclick="closePopUp()" class="closePopUp">&times;</span>
+      <div class="modelContentBody" id="grayMapBody"></div>
     </div>
-    <div class="data_mode">
-        <ul class="demo-list-control mdl-list">
-          <li class="mdl-list__item">
-            <span class="dark_mode mdl-list__item-primary-content">
-              Full 3D mode
-            </span>
-            <span class="mdl-list__item-secondary-action">
-              <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
-                <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked/>
-              </label>
-            </span>
-          </li>
-          <li class="mdl-list__item">
-            <span class="dark_mode mdl-list__item-primary-content">
-              3D simplified
-            </span>
-            <span class="mdl-list__item-secondary-action">
-              <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-2">
-                <input type="radio" id="list-option-2" class="mdl-radio__button" name="options" value="2"/>
-              </label>
-            </span>
-          </li>
-          <li class="mdl-list__item">
-            <span class="dark_mode mdl-list__item-primary-content">
-              Full 2D mode
-            </span>
-            <span class="mdl-list__item-secondary-action">
-              <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-3">
-                <input type="radio" id="list-option-3" class="mdl-radio__button" name="options" value="3"/>
-              </label>
-            </span>
-          </li>
-        </ul>
-    </div>
-    <p class="total_energy_sum">0</p>
-    <div class="range-slider-wrapper">
-      <div id="range-slider"></div>
-    </div>
+  </div>
 	<script src="js/app.js"></script>
 </body>
