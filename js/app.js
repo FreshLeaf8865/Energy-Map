@@ -1,4 +1,4 @@
-if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+if (!Detector.webgl) Detector.addGetWebGLMessage();
 
 var container, stats;
 var data;
@@ -34,125 +34,9 @@ var stateName = 'New York';
 var currentYear = 2014;
 
 var frustumSize = 1000;
+var currentMaxValue = 0;
 
-//<-- variables and constants for range slider
-const V32 = 6713924.71096368, V33 = 9220164.67645724, V34 = 6696779.94470847, V35 = 0, W32 = 147694.905991326, W33 = 62164.7495848525, W34 = 63714.9196865604, W35 = 0, X35 = 23244349.8830916, Y35 = 3402810.70215527, Z35 = 1927823.98763521, VIS_VAL_MAX = 4.25;
-var rA1, rA2, rA3, rA4, rA5, rA6, ciA1, ciA2, ciA3, ciA4, ciA5, ciA6, tA1, tA2, tA3, tA4, tA5, tA6;
-var rangeSlider = 0,
-    dataCubeChart = [],
-    dataRange = [
-			10, // CL
-			20,  // PA
-			30,  // NG
-			50, // A6
-			60,  // A3
-			70,  // A1
-			80,  // A5
-			90,  // A2
-			95  // A4
-    ],
-    dataRangeArray = [
-			10, // CL
-			20,  // PA
-			30,  // NG
-			50, // A6
-			60,  // A3
-			70,  // A1
-			80,  // A5
-			90,  // A2
-			95  // A4
-    ],
-    dataRangeLabelCode = [
-			"CL",
-			"PA",
-			"NG",
-			"A6",
-			"A3",
-			"A1",
-			"A5",
-			"A2",
-			"A4"
-    ],
-    handleInited = [
-			false,
-			false,
-			false,
-			false,
-			false,
-			false,
-			false,
-			false,
-			false
-    ],
-    dataRangeLabel = [
-			"Coal",
-			"Petroleum",
-			"Natural Gas",
-			"Nuclear",
-			"Geothermal",
-			"Solar",
-			"Biomass",
-			"Wind",
-			"Hydro"
-    ],
-    sliderHandleStyleClass = [
-			"coal",
-			"petroleum",
-			"natural-gas",
-			"nuclear",
-			"geothermal",
-			"solar",
-			"biomass",
-			"wind",
-			"hydro",
-			"hydro"
-    ],
-    dataRangeColor = [
-			"#404040",
-			"#808080",
-			"#bfbfbf",
-			"#D9444E",
-			"#F77C48",
-			"#FFDB87",
-			"#9DD7A5",
-			"#3C8FBB",
-			"#4E6EB1",
-			"#4E6EB1"
-    ],
-    dataParamByIndex = {
-			"rA1": 0,
-			"rA2": 0,
-			"rA3": 0,
-			"rA4": 0,
-			"rA5": 0,
-			"rA6": 0,
-			"ciA1": 0,
-			"ciA2": 0,
-			"ciA3": 0,
-			"ciA4": 0,
-			"ciA5": 0,
-			"ciA6": 0,
-			"tA1": 0,
-			"tA2": 0,
-			"tA3": 0,
-			"tA4": 0,
-			"tA5": 0,
-			"tA6": 0,
-			"cl": 0,
-			"ng": 0,
-			"pa": 0,
-    };
-//<-- variables and constants for range slider
-
-// data for cube
-$.getJSON('https://dl.dropboxusercontent.com/s/2wlj6asyoai8dk0/cube_test.json', function (info) {
-	var count = Object.keys(info).length;
-	for (var i = 1; i <= count; i++) {
-		dataCubeChart.push(info[i]);
-	}
-});
-
-$.getJSON('https://dl.dropboxusercontent.com/s/3aqbpvn6kar1a87/data.json', function (info) {
+$.getJSON('data.json', function (info) {
 	data = info;
 
 	var count = Object.keys(data).length;
@@ -162,13 +46,12 @@ $.getJSON('https://dl.dropboxusercontent.com/s/3aqbpvn6kar1a87/data.json', funct
 	}
 
 	// get unique years
-	years = years.filter( uniqueVal );
+	years = years.filter(uniqueVal);
 	years.sort(function (a, b) {return a - b});
 
 	//sort data by years
 	for (var i = 0; i < years.length; i++) {
 		dataByYear[years[i]] = [];
-
 		for (var j = 1; j < count; j++) {
 			if (data[j].Year !== years[i]) { continue }
 			dataByYear[years[i]].push(data[j]);
@@ -189,21 +72,13 @@ $.getJSON('https://dl.dropboxusercontent.com/s/3aqbpvn6kar1a87/data.json', funct
 	input.setAttribute("max", years[years.length-1]);
 	input.setAttribute("value", years[years.length-1]);
 
-	document.getElementById("slider1-value").innerHTML = years[years.length - 1];
-	
+	document.getElementById("slider1-value").innerHTML =years[years.length-1];
+
 	init();
 	animate();
-	changeData(currentYear);
-
-	// init slider connect color
-	$('#range-slider .noUi-connect').each(function (index) {
-		$(this).css('background', dataRangeColor[index]);
-	});
-	// add the hexagon class to slider handle
-	$('#range-slider .noUi-tooltip').each(function (index) {
-		$(this).addClass('hexagon').addClass(sliderHandleStyleClass[index]);
-	});
+	changeData(2010);
 });
+
 
 // RETURN UNIQUE VALUE
 
@@ -221,259 +96,26 @@ Array.prototype.clean = function (deleteValue) {
   return this;
 };
 
-var getParamIndex = function (paramName) {
-  return dataParamByIndex[paramName];
-};
-
-function getHandleValue(values, handle, isInt) {
-	var result = parseFloat(values[handle]);
-
-	if (handle > 0) {
-		result = parseFloat(values[handle]) - parseFloat(values[handle - 1]);
-	}
-
-	if (isInt) {
-		return parseInt(Math.round(result));
-	} else {
-		return result;
-	}
-}
-
-/**
- * Create multi range slider
- */
-function createMultiRangeSlider(inputRange) {
-	var data4Slider = [], maxRange = 0, inputRangeLen = inputRange.length;
-	// Generate data for slider
-	for (var i = 0; i < inputRangeLen; i++) {
-		maxRange += inputRange[i];
-		data4Slider.push(maxRange);
-	}
-	if (rangeSlider != 0) {
-		// slider already created
-		rangeSlider.noUiSlider.updateOptions({
-			start: data4Slider
-		});
-	} else {
-		// create multi range slider
-		rangeSlider = document.getElementById('range-slider');
-		noUiSlider.create(rangeSlider, {
-			start: data4Slider,
-			connect: [true, true, true, true, true, true, true, true, true, true],
-			tooltips: [true, true, true, true, true, true, true, true, true],
-			range: {
-				'min': 0,
-				'max': maxRange
-			}
-		}).on('update', function (values, handle) {
-			var handles = values.length;
-			for (var i = 0; i < handles; i++) {
-				$('.noUi-handle[data-handle="' + i + '"] .noUi-tooltip').text('').html('<p class="noUi-tooltip-text">' + dataRangeLabel[i] + '</p>');
-				$('.noUi-handle[data-handle="' + i + '"]').attr('data-before', getHandleValue(values, i, true));
-			}
-			updateRangeSlider(values, handle);
-		});
-	}
-}
-
-/**
- * Initialize range slider
- */
-function initRangeSlider() {
-	// init values
-	var filteredDataLen = dataCubeChart.length, clSum = ngSum = paSum = checkSum = 0;
-	for (var i = 0; i < filteredDataLen; i++) {
-		var filteredDataItem = dataCubeChart[i], filterDataItemType = filteredDataItem.Type;
-
-		if (filterDataItemType == "B") {
-			clPercent = parseFloat(filteredDataItem['11']) / V32 * 100;
-			ngPercent = (parseFloat(filteredDataItem['21']) - W32) / V32 * 100;
-			paPercent = parseFloat(filteredDataItem['31']) / V32 * 100;
-			
-			var c13 = parseFloat(filteredDataItem['11']),
-			d13 = clPercent * (W33 + W34) / 100,
-			e13 = clPercent * V35 / 100,
-			clSum = c13 + d13 + e13,
-			f13 = ngPercent * V32 / 100,
-			g13 = ngPercent * (V33 + V34) / 100,
-			h13 = ngPercent * V35 / 100,
-			ngSum = f13 + g13 + h13,
-			i13 = paPercent * V32 / 100,
-			j13 = paPercent * (V33 + V34) / 100;
-			k13 = paPercent * V35,
-			paSum = i13 + j13 + k13,
-			checkSum = clSum + ngSum + paSum;
-
-			// values for calculating
-			dataParamByIndex['cl'] = clSum / checkSum;
-			dataParamByIndex['ng'] = ngSum / checkSum;
-			dataParamByIndex['pa'] = paSum / checkSum;
-
-			// values for range slider
-			dataRangeArray[dataRangeLabelCode.indexOf("CL")] = clPercent;
-			dataRangeArray[dataRangeLabelCode.indexOf("NG")] = ngPercent;
-			dataRangeArray[dataRangeLabelCode.indexOf("PA")] = paPercent;
-		} else if (filterDataItemType != "C") {
-			var rVal = parseFloat(filteredDataItem['11']) + parseFloat(filteredDataItem['21']) + parseFloat(filteredDataItem['31']),
-					ciVal = parseFloat(filteredDataItem['12']) + parseFloat(filteredDataItem['22']) + parseFloat(filteredDataItem['32']),
-					tVal = parseFloat(filteredDataItem['13']) + parseFloat(filteredDataItem['23']) + parseFloat(filteredDataItem['33']);
-			dataParamByIndex["r" + filterDataItemType] = rVal;
-			dataParamByIndex["ci" + filterDataItemType] = ciVal;
-			dataParamByIndex["t" + filterDataItemType] = tVal;
-
-			// value for range slider
-			dataRangeArray[dataRangeLabelCode.indexOf(filterDataItemType)] = getParamIndex("r" + filterDataItemType) / V32 * 100;
-		}
-	}
-
-	// create range slider
-	createMultiRangeSlider(dataRangeArray);
-}
-
-/**
- * Update range slider event
- * @param {*} values data
- * @param {*} handle index
- */
-function updateRangeSlider(values, handle) {
-	// check if it is slider initialization
-	if (!handleInited[handle]) {
-		handleInited[handle] = true;
-	}
-	for (var i = 0; i < handleInited.length; i++) {
-		if (!handleInited[i]) {
-			return;
-		}
-	}
-	// update the data
-	var rangeLabel = dataRangeLabelCode[handle],
-	clParam = dataRangeArray[dataRangeLabelCode.indexOf("CL")],
-	ngParam = dataRangeArray[dataRangeLabelCode.indexOf("NG")],
-	paParam = dataRangeArray[dataRangeLabelCode.indexOf("PA")];
-
-	if (rangeLabel == "CL") {
-		clParam = getHandleValue(values, handle, false);
-	} else if (rangeLabel == "PA") {
-		paParam = getHandleValue(values, handle, false);
-	} else if (rangeLabel == "NG") {
-		ngParam = getHandleValue(values, handle, false);
-	} else {
-		dataParamByIndex['r' + rangeLabel] = getHandleValue(values, handle, false) * V32 / 100;
-		dataParamByIndex['ci' + rangeLabel] = getHandleValue(values, handle, false) * (V33 + V34) / 100;
-		dataParamByIndex['t' + rangeLabel] = getHandleValue(values, handle, false) * V35 / 100;
-	}
-
-	// generate data from slider changes
-	var updatedData = [], updatedDataLen = dataCubeChart.length;
-	for (var i = 0; i < updatedDataLen; i++) {
-		var updatedDataItem = {}, updatedDataItemType = dataCubeChart[i].Type;
-
-		if (updatedDataItemType == "B") {
-			updatedDataItem['11'] = String(clParam * V32 / 100);
-			updatedDataItem['12'] = String((clParam * (V33 + V34)) / 100);
-			updatedDataItem['13'] = String((clParam * V35) / 100);
-			updatedDataItem['21'] = String(((ngParam * V32) / 100) + W32);
-			updatedDataItem['22'] = String(((W33 + W34) + ((ngParam * (V33 + V34) / 100))));
-			updatedDataItem['23'] = String(((ngParam * V35 / 100) + W35));
-			updatedDataItem['31'] = String(paParam * V32 / 100);
-			updatedDataItem['32'] = String(paParam * (V33 + V34) / 100);
-			updatedDataItem['33'] = String(((paParam * V35 / 100) + (X35 + Y35 + Z35)));
-		} else if (updatedDataItemType != "C") {
-			for (var j = 1; j <= 3; j++) {
-				updatedDataItem[j + '1'] = String(getParamIndex('r' + updatedDataItemType) * getParamIndex('cl'));
-				updatedDataItem[j + '2'] = String(getParamIndex('ci' + updatedDataItemType) * getParamIndex('cl'));
-				updatedDataItem[j + '3'] = String(getParamIndex('t' + updatedDataItemType) * getParamIndex('cl'));
-			}
-		} else {
-			for (var j = 1; j <= 3; j++) {
-				for (var k = 1; k <= 3; k++) {
-					updatedDataItem[String(j) + String(k)] = dataCubeChart[i][String(j) + String(k)];
-				}
-			}
-		}
-
-		updatedDataItem['State'] = dataCubeChart[i].State;
-		updatedDataItem['Type'] = dataCubeChart[i].Type;
-		updatedDataItem['Year'] = dataCubeChart[i].Year;
-		updatedData.push(updatedDataItem);
-	}
-
-	// update graph
-	for (var i = 0; i < 8; i++) {
-		layer[i] = [];
-	}
-
-	for (var i = 0; i < updatedDataLen; i++) {
-		fillGraph(updatedData[i].Type, updatedData[i], i);
-	}
-	updateGraphVisually();
-}
-
-/**
- * jQuery plugin to add comma to numbers every three digits
- */
-$.fn.digits = function () {
-	return this.each(function () {
-		$(this).text($(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
-	})
-}
-
-/**
- * Show the total energy sum of cubes are visible currently
- */
-function showTotalEnergySum() {
-	var sum = 0;
-	for (var i = graph.length - 1; i >= 0; i--) {
-		if (graph[i].visible == true && graph[i].name.indexOf("-") >= 0) {
-			sum += graph[i].value;
-		}
-	}
-	$(".total_energy_sum").text(sum).digits();
-}
-
-/**
- * Switch filter item
- */
-function switchFilterItem() {
-	var checkBox = document.getElementById("switch-filter-item");
-
-	$('.filter-item').each(function (index) {
-		if (checkBox.checked == true) {
-			$(this).removeClass('off').addClass('on');
-		} else {
-			$(this).removeClass('on').addClass('off');
-		}
-	});
-
-	for (var i = graph.length - 1; i >= 0; i--) {
-		graph[i].visible = checkBox.checked;
-	}
-
-	showTotalEnergySum();
-}
-
 function init() {
-	container = document.getElementById( 'canvas' );
+	container = document.getElementById('canvas');
 
 	var aspect = window.innerWidth / window.innerHeight;
-	// camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 10000 );
-	var d = 60;
-	camera = new THREE.OrthographicCamera(- d * aspect, d * aspect, d, - d, 1, 1000);
+	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000);
 	// camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 2000 );
 							
-	camera.position.set( 60,60,60 );
+	camera.position.set(0, 50, 100);
 
-	cameraTarget = new THREE.Vector3( 0, 0, 0 );
+	cameraTarget = new THREE.Vector3(0, 30, 0);
 
 	scene = new THREE.Scene();
 	///scene.background = new THREE.Color( 0x72645b );
-	scene.fog = new THREE.Fog( 0xffffff, 100, 150 );
+	scene.fog = new THREE.Fog(0xffffff, 100, 150);
 
 	// Ground if needed
 
 	var plane = new THREE.Mesh(
-		new THREE.PlaneBufferGeometry( 40, 40 ),
-		new THREE.MeshPhongMaterial( { color: 0x9FD6E1, specular: 0x101010 } )
+		new THREE.PlaneBufferGeometry(40, 40),
+		new THREE.MeshPhongMaterial({color: 0x9FD6E1, specular: 0x101010})
 	);
 	plane.rotation.x = -Math.PI/2;
 	//scene.add( plane );
@@ -504,14 +146,15 @@ function init() {
 				var material5 = new THREE.MeshPhongMaterial( { color: 0x9DD7A5, transparent: true, shininess: 200, opacity: 0.8 } ); //BioFuel
 				var material8 = new THREE.MeshPhongMaterial( { color: 0xD9444E, transparent: true, shininess: 200, opacity: 0.8 } ); //Nuclear
 
-				heigth1[i] =  1;
-				heigth2[i] =  1;
-				heigth3[i] =  1;
-				heigth4[i] =  1;
-				heigth5[i] =  1;
-				heigth6[i] =  1;
-				heigth7[i] =  1;
-				heigth8[i] =  1;
+
+				heigth1[i] = 1;
+				heigth2[i] = 1;
+				heigth3[i] = 1;
+				heigth4[i] = 1;
+				heigth5[i] = 1;
+				heigth6[i] = 1;
+				heigth7[i] = 1;
+				heigth8[i] = 1;
 
 				var firstLetter = i + 1;
 				var secondLetter = j + 1;
@@ -530,7 +173,7 @@ function init() {
 				cube.name = 'B-' + firstLetter + '' + secondLetter + '';
 				cube.energyType = 'waste';
 				graphSystem.add(cube);
-				graph.push( cube );
+				graph.push(cube);
 
 				var cube2 = new THREE.Mesh( geometry2, material2 );
 				cube2.position.set(spread * i - 11, heigth2[i] / 2 + heigth1[i], spread * j - 111);
@@ -562,51 +205,50 @@ function init() {
 					cube2.material.transparent = true;
 					cube2.material.opacity = 0.8;
 				}
-
 				graphSystem.add(cube2);
-				graph.push( cube2 );
+				graph.push(cube2);
 
-				var cube3 = new THREE.Mesh( geometry3, material3 );
+				var cube3 = new THREE.Mesh(geometry3, material3);
 				cube3.position.set(spread * i - 11, heigth3[i] / 2 + heigth1[i] + heigth2[i], spread * j - 111);
 				cube3.name = 'A4-' + firstLetter + '' + secondLetter + '';
 				cube3.energyType = 'Hydro';
 				graphSystem.add(cube3);
 				graph.push(cube3);
 
-				var cube4 = new THREE.Mesh( geometry4, material4 );
+				var cube4 = new THREE.Mesh(geometry4, material4);
 				cube4.position.set(spread * i - 11, heigth4[i] / 2 + heigth1[i] + heigth2[i] + heigth3[i], spread * j - 111);
 				cube4.name = 'A2-' + firstLetter + '' + secondLetter + '';
 				cube4.energyType = 'Wind';
 				graphSystem.add(cube4);
-				graph.push( cube4 );
+				graph.push(cube4);
 
-				var cube5 = new THREE.Mesh( geometry5, material5 );
+				var cube5 = new THREE.Mesh(geometry5, material5);
 				cube5.position.set(spread * i - 11, heigth5[i] / 2 + heigth1[i] + heigth2[i] + heigth3[i] + heigth4[i], spread * j - 111);
 				cube5.name = 'A5-' + firstLetter + '' + secondLetter + '';
 				cube5.energyType = 'Biofuel';
 				graphSystem.add(cube5);
-				graph.push( cube5 );
+				graph.push(cube5);
 
-				var cube6 = new THREE.Mesh( geometry6, material6 );
+				var cube6 = new THREE.Mesh(geometry6, material6);
 				cube6.position.set(spread * i - 11, heigth6[i] / 2 + heigth1[i] + heigth2[i] + heigth3[i] + heigth4[i] + heigth5[i], spread * j - 111);
 				cube6.name = 'A1-' + firstLetter + '' + secondLetter + '';
 				cube6.energyType = 'Solar';
 				graphSystem.add(cube6);
-				graph.push( cube6 );
+				graph.push(cube6);
 
-				var cube7 = new THREE.Mesh( geometry7, material7 );
+				var cube7 = new THREE.Mesh(geometry7, material7);
 				cube7.position.set(spread * i - 11, heigth7[i] / 2 + heigth1[i] + heigth2[i] + heigth3[i] + heigth4[i] + heigth5[i] + heigth6[i], spread * j - 111);
 				cube7.name = 'A3-' + firstLetter + '' + secondLetter + '';
 				cube7.energyType = 'Geothermal';
 				graphSystem.add(cube7);
-				graph.push( cube7 );
+				graph.push(cube7);
 
-				var cube8 = new THREE.Mesh( geometry8, material8 );
+				var cube8 = new THREE.Mesh(geometry8, material8);
 				cube8.position.set(spread * i - 11, heigth8[i] / 2 + heigth1[i] + heigth2[i] + heigth3[i] + heigth4[i] + heigth5[i] + heigth6[i] + heigth7[i], spread * j - 111);
 				cube8.name = 'A6-' + firstLetter + '' + secondLetter + '';
 				cube8.energyType = 'Nuclear';
 				graphSystem.add(cube8);
-				graph.push( cube8 );
+				graph.push(cube8);
 			}
 		}
 		//scene.add(graph);
@@ -626,32 +268,31 @@ function init() {
 		var material5 = new THREE.MeshPhongMaterial( { color: 0x9DD7A5, transparent: true, shininess: 200, opacity: 0.8 } ); //BioFuel
 		var material8 = new THREE.MeshPhongMaterial( { color: 0xD9444E, transparent: true, shininess: 200, opacity: 0.8 } ); //Nuclear
 
-
 		var geometry = new THREE.BoxBufferGeometry( 20, 1, 20 );
 
-		var cube00 = new THREE.Mesh( geometry, material00 );
+		var cube00 = new THREE.Mesh(geometry, material00);
 		cube00.position.set(0, 0, 100);
 		cube00.name = 'B00';
 		cube00.singleTower = true;
 		cube00.energyType = 'Natural gas';
 		graphSystem.add(cube00);
-		graph.push( cube00 );
+		graph.push(cube00);
 
-		var cube01 = new THREE.Mesh( geometry, material01 );
+		var cube01 = new THREE.Mesh(geometry, material01);
 		cube01.position.set(0, 1, 100);
 		cube01.name = 'B01';
 		cube01.singleTower = true;
 		cube01.energyType = 'Petroleum';
 		graphSystem.add(cube01);
-		graph.push( cube01 );
+		graph.push(cube01);
 
-		var cube02 = new THREE.Mesh( geometry, material02 );
+		var cube02 = new THREE.Mesh(geometry, material02);
 		cube02.position.set(0, 2, 100);
 		cube02.name = 'B02';
 		cube02.singleTower = true;
 		cube02.energyType = 'Coal';
 		graphSystem.add(cube02);
-		graph.push( cube02 );
+		graph.push(cube02);
 
 		// var cube = new THREE.Mesh( geometry, material1 );
 		// cube.position.set(0,0,100);
@@ -661,66 +302,66 @@ function init() {
 		// graphSystem.add(cube);
 		// graph.push( cube );
 
-		var cube2 = new THREE.Mesh( geometry, material2 );
+		var cube2 = new THREE.Mesh(geometry, material2);
 		cube2.position.set(0, 3, 100);
 		cube2.name = 'C';
 		cube2.singleTower = true;
 		cube2.energyType = 'waste';
-		cube2.material.color = new THREE.Color( 0xCAC9C9 );
+		cube2.material.color = new THREE.Color(0xCAC9C9);
 		graphSystem.add(cube2);
-		graph.push( cube2 );
+		graph.push(cube2);
 
-		var cube3 = new THREE.Mesh( geometry, material3 );
+		var cube3 = new THREE.Mesh(geometry, material3);
 		cube3.position.set(0, 4, 100);
 		cube3.name = 'A4';
 		cube3.singleTower = true;
 		cube3.energyType = 'Hydro';
 		graphSystem.add(cube3);
-		graph.push( cube3 );
+		graph.push(cube3);
 
 		var cube4 = new THREE.Mesh( geometry, material4 );
-		cube4.position.set(0, 5, 100);
+		cube4.position.set(0,5,100);
 		cube4.name = 'A2';
 		cube4.singleTower = true;
 		cube4.energyType = 'Wind';
 		graphSystem.add(cube4);
 		graph.push( cube4 );
 
-		var cube5 = new THREE.Mesh( geometry, material5 );
+		var cube5 = new THREE.Mesh(geometry, material5);
 		cube5.position.set(0, 6, 100);
 		cube5.name = 'A5';
 		cube5.singleTower = true;
 		cube5.energyType = 'Biofuel';
 		graphSystem.add(cube5);
-		graph.push( cube5 );
+		graph.push(cube5);
 
-		var cube6 = new THREE.Mesh( geometry, material6 );
+		var cube6 = new THREE.Mesh(geometry, material6);
 		cube6.position.set(0, 7, 100);
 		cube6.name = 'A1';
 		cube6.singleTower = true;
 		cube6.energyType = 'Solar';
 		graphSystem.add(cube6);
-		graph.push( cube6 );
+		graph.push(cube6);
 
-		var cube7 = new THREE.Mesh( geometry, material7 );
+		var cube7 = new THREE.Mesh(geometry, material7);
 		cube7.position.set(0, 8, 100);
 		cube7.name = 'A3';
 		cube7.singleTower = true;
 		cube7.energyType = 'Geothermal';
 		graphSystem.add(cube7);
-		graph.push( cube7 );
+		graph.push(cube7);
 
-		var cube8 = new THREE.Mesh( geometry, material8 );
+		var cube8 = new THREE.Mesh(geometry, material8);
 		cube8.position.set(0, 9, 100);
 		cube8.name = 'A6';
 		cube8.singleTower = true;
 		cube8.energyType = 'Nuclear';
 		graphSystem.add(cube8);
-		graph.push( cube8 );
+		graph.push(cube8);
 	}
 
 	createGraph();
-	createGraph2();	
+	createGraph2();   
 
 	// Lights shortcodes to add light
 
@@ -760,10 +401,10 @@ function init() {
 }
 
 // Function that creates light with its given parameters
-function addShadowedLight( x, y, z, color, intensity ) {
-	var directionalLight = new THREE.DirectionalLight( color, intensity );
-	directionalLight.position.set( x, y, z );
-	scene.add( directionalLight );
+function addShadowedLight(x, y, z, color, intensity) {
+	var directionalLight = new THREE.DirectionalLight(color, intensity);
+	directionalLight.position.set(x, y, z);
+	scene.add(directionalLight);
 
 	directionalLight.castShadow = true;
 
@@ -786,12 +427,12 @@ function onWindowResize() {
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
 
-	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function animate() {
-	requestAnimationFrame( animate );
-	camera.lookAt (cameraTarget);
+	requestAnimationFrame(animate);
+	camera.lookAt(cameraTarget);
 
 	// graphSystem.rotation.y += 0.1;
 
@@ -800,8 +441,7 @@ function animate() {
 
 function render() {
 	TWEEN.update();
-
-	renderer.render( scene, camera );
+	renderer.render(scene, camera);
 }
 
 // SLIDERS
@@ -811,17 +451,14 @@ for (var i = 0; i < sliders.length; i++) {
 	sliders[i].addEventListener('input', onSliderInput, false);
 	sliders[i].addEventListener('change', onSliderChange, false);
 }
-
 function onSliderInput() {
 	var output = 'slider' + this.id + '-value';
 	document.getElementById(output).innerHTML = this.value;
-	changeData(this.value);
+  changeData(this.value);
 }
-
 function onSliderChange() {
   changeData(this.value);
 }
-
 function onDocumentMouseMove(event) {
 	if (!INTERSECTED) {
 		var popupX = event.clientX;
@@ -835,9 +472,9 @@ function onDocumentMouseMove(event) {
 	raycaster.setFromCamera(mouse, camera);
 	var intersects = raycaster.intersectObjects(graph);
 
-	if ( intersects.length > 0 ) {
-		if ( INTERSECTED != intersects[0].object ) {
-			if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+	if (intersects.length > 0) {
+		if (INTERSECTED != intersects[ 0 ].object) {
+			if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
 
 			for (var i = 0; i < graph.length; i++) {
 				graph[i].material.opacity = 0.6;
@@ -855,28 +492,28 @@ function onDocumentMouseMove(event) {
 		towerName = towerName.substring(towerName.indexOf("-") + 1); // get tower index (11...33)
 
 		if (INTERSECTED.singleTower) {
-			var totalSum =  parseInt(scene.getObjectByName('B00').value) +
-											parseInt(scene.getObjectByName('B01').value) +
-											parseInt(scene.getObjectByName('B02').value) +
-											parseInt(scene.getObjectByName('C').value) +
-											parseInt(scene.getObjectByName('A1').value) +
-											parseInt(scene.getObjectByName('A2').value) +
-											parseInt(scene.getObjectByName('A3').value) +
-											parseInt(scene.getObjectByName('A4').value) +
-											parseInt(scene.getObjectByName('A5').value) +
-											parseInt(scene.getObjectByName('A6').value);
+			var totalSum =  parseInt(scene.getObjectByName( 'B00' ).value) +
+											parseInt(scene.getObjectByName( 'B01' ).value) +
+											parseInt(scene.getObjectByName( 'B02' ).value) +
+											parseInt(scene.getObjectByName( 'C' ).value) +
+											parseInt(scene.getObjectByName( 'A1' ).value) +
+											parseInt(scene.getObjectByName( 'A2' ).value) +
+											parseInt(scene.getObjectByName( 'A3' ).value) +
+											parseInt(scene.getObjectByName( 'A4' ).value) +
+											parseInt(scene.getObjectByName( 'A5' ).value) +
+											parseInt(scene.getObjectByName( 'A6' ).value);
 
 			// var sectorType = ' All type of </b> sector(s)';
 			var sectorType = '';
 		} else {
-			var totalSum =  parseInt(scene.getObjectByName('B-' + towerName + '').value) +
-											parseInt(scene.getObjectByName('C-' + towerName + '').value) +
-											parseInt(scene.getObjectByName('A1-' + towerName + '').value) +
-											parseInt(scene.getObjectByName('A2-' + towerName + '').value) +
-											parseInt(scene.getObjectByName('A3-' + towerName + '').value) +
-											parseInt(scene.getObjectByName('A4-' + towerName + '').value) +
-											parseInt(scene.getObjectByName('A5-' + towerName + '').value) +
-											parseInt(scene.getObjectByName('A6-' + towerName + '').value);
+			var totalSum =  parseInt(scene.getObjectByName( 'B-'+towerName+'' ).value) +
+											parseInt(scene.getObjectByName( 'C-'+towerName+'' ).value) +
+											parseInt(scene.getObjectByName( 'A1-'+towerName+'' ).value) +
+											parseInt(scene.getObjectByName( 'A2-'+towerName+'' ).value) +
+											parseInt(scene.getObjectByName( 'A3-'+towerName+'' ).value) +
+											parseInt(scene.getObjectByName( 'A4-'+towerName+'' ).value) +
+											parseInt(scene.getObjectByName( 'A5-'+towerName+'' ).value) +
+											parseInt(scene.getObjectByName( 'A6-'+towerName+'' ).value);
 
 			var sectorType = ' in ' + INTERSECTED.sector + '</b> sector(s)';
 		}
@@ -892,50 +529,85 @@ function onDocumentMouseMove(event) {
 		// console.log('tower index: ',towerName, 'tower total value: ',totalSum); // Helps better understand what tower type is hovered and its sum
 
 		// $('#popup').html('<b>'+INTERSECTED.state+'</b> '+verb+' <b>'+INTERSECTED.value+'</b> Quads of <b>'+energyType+'</b> energy<b>'+sectorType+', out of <b>'+totalSum+'</b> Quads total, in <b>'+INTERSECTED.year+'</b> year<br>Some additional text here<br>Link: <a href="">You cant click this link :D</a>'); //show some data in popup window on intersection
-		// $('#popup').html('<b>'+stateName+'</b> '+verb+' <b>'+INTERSECTED.value+'</b> Quads of <b>'+energyType+'</b> energy<b>'+sectorType+', out of <b>'+totalSum+'</b> Quads total, in <b>'+INTERSECTED.year+'</b> year<br>Some additional text here<br>Link: <a href="">You cant click this link :D</a>'); //show some data in popup window on intersection
-		$('#popup').html(
-			'<b>Kansas City</b> ' + verb +
-			' <b>' + INTERSECTED.value +
-			'</b> mm BTU of <b>' + energyType +
-			'</b> energy<b>' + sectorType +
-			', out of <b>' + totalSum +
-			'</b> mm BTUs total, in <b>' + INTERSECTED.year +
-			'</b> year<br>Some additional text here<br>Link: <a href="#" onclick="onDocumentClickPopUp(' + INTERSECTED.id + ');">You cant click this link :D</a>'
-		);
+		$('#popup').html('<b>' + stateName + '</b> ' + verb + ' <b>' + INTERSECTED.value + '</b> Quads of <b>' + energyType + '</b> energy<b>' + sectorType + ', out of <b>' + totalSum + '</b> Quads total, in <b>' + INTERSECTED.year + '</b> year<br>Some additional text here<br>Link: <a href="#" onclick="onDocumentClickPopUp(' + INTERSECTED.id + ');">You cant click this link :D</a>'); //show some data in popup window on intersection
 		$('#popup').fadeIn(300);
-		$('#popup').css('left','' + popupX + 'px');
-		$('#popup').css('top','' + popupY + 'px');
+		$('#popup').css('left', '' + popupX + 'px');
+		$('#popup').css('top', '' + popupY + 'px');
 	} else {
-		if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+		if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
 
 		INTERSECTED = null;
-
 		$('html,body').css('cursor', 'default');
 
 		for (var i = 0; i < graph.length; i++) {
 			graph[i].material.opacity = 0.8;
 		}
 
-		if ($( '#popup' ).hasClass( 'close' )) {
+		if ($( '#popup' ).hasClass('close')) {
 			$('#popup').fadeOut(400);            
 		} else {
 			$('#popup').fadeIn(100);       
 		}
 	}
 }
-
 function rotateGraph(angle) {
   graphSystem.rotation.y = angle;
 }
 
+function getMaxValue() {
+	var max_value = 0;
+	for (var j = 0; j < years.length; j++) {
+		filteredData = [];
+		var year = years[j];
+
+		for (var i = 0; i < dataByYear[year].length; i++) {
+			if (dataByYear[year][i].State == stateId) {
+				filteredData.push(dataByYear[year][i]);
+			}
+		}
+		var arr = [];
+		for (var i = 0; i < filteredData.length; i++) {
+			arr.push(filteredData[i]['11']);
+			arr.push(filteredData[i]['12']);
+			arr.push(filteredData[i]['13']);
+			arr.push(filteredData[i]['21']);
+			arr.push(filteredData[i]['22']);
+			arr.push(filteredData[i]['23']);
+			arr.push(filteredData[i]['31']);
+			arr.push(filteredData[i]['32']);
+			arr.push(filteredData[i]['33']);
+		}
+		for (var i = 0; i < arr.length; i++) {
+			arr[i] = parseFloat(arr[i]);
+		}
+		arr.sort(function(a, b) {
+			return a - b;
+		});
+
+		var scaled_arr = [];
+		var hash = {};
+		scaled_arr.push(Math.log(arr[0] + 2));
+		for (var i = 0; i < arr.length - 1; i++) {
+			var diff = Math.log((arr[i + 1] - arr[i]) + 1);
+			var last = scaled_arr[scaled_arr.length - 1]
+			scaled_arr.push(last + diff);
+		}
+		for (var i = 0; i < scaled_arr.length; i++) {
+			max_value = Math.max(max_value, scaled_arr[i]);
+		}
+	}
+	return max_value;
+}
+
 function changeData(year) {
 	currentYear = year;
+	currentMaxValue = getMaxValue();
 
 	filteredData = [];
 
 	for (var i = 0; i < dataByYear[year].length; i++) {
-		if ( dataByYear[year][i].State == stateId ) {
-			filteredData.push( dataByYear[year][i] );
+		if (dataByYear[year][i].State == stateId) {
+			filteredData.push(dataByYear[year][i]);
 		}
 	}
 
@@ -943,16 +615,50 @@ function changeData(year) {
 		layer[i] = [];
 	}
 
+	var arr = [];
 	for (var i = 0; i < filteredData.length; i++) {
-		fillGraph( filteredData[i].Type, filteredData[i], i );
+		arr.push(filteredData[i]['11']);
+		arr.push(filteredData[i]['12']);
+		arr.push(filteredData[i]['13']);
+		arr.push(filteredData[i]['21']);
+		arr.push(filteredData[i]['22']);
+		arr.push(filteredData[i]['23']);
+		arr.push(filteredData[i]['31']);
+		arr.push(filteredData[i]['32']);
+		arr.push(filteredData[i]['33']);
+	}
+	for (var i = 0; i < arr.length; i++) {
+		arr[i] = parseFloat(arr[i]);
+	}
+	arr.sort(function(a, b) {
+		return a - b;
+	});
+
+	var scaled_arr = [];
+	var hash = {};
+	scaled_arr.push(Math.log(arr[0] + 2));
+	for (var i = 0; i < arr.length - 1; i++) {
+		var diff = Math.log((arr[i + 1] - arr[i]) + 1);
+		var last = scaled_arr[scaled_arr.length - 1]
+		scaled_arr.push(last + diff);
+	}
+	for (var i = 0; i < scaled_arr.length; i++) {
+		scaled_arr[i] = scaled_arr[i] / currentMaxValue * 10;
+	}
+	for (var i = 0; i < arr.length; i++) {
+		hash[arr[i]] = scaled_arr[i];
+	}
+	
+	for (var i = 0; i < filteredData.length; i++) {
+		fillGraph( filteredData[i].Type, filteredData[i], i, hash );
 	}
 
 	updateGraphVisually();
+
 	// updateChart();
-	initRangeSlider();
 }
 
-function fillGraph(name, dataSet, layerNumber) {
+function fillGraph(name,dataSet,layerNumber, hash) {
 	layer[layerNumber].name = name; //assigning layer name
 
 	var correctionValue = 2; // any dummy positive value otherwise logarithmic scale returns -Infinity
@@ -969,7 +675,7 @@ function fillGraph(name, dataSet, layerNumber) {
 		object00.year = dataSet.Year;
 		var visValue2;
 
-		if ( rawValue2 < 1 ) { visValue2 = Math.log(correctionValue) } else { visValue2 = Math.log(rawValue2) }
+		if (rawValue2 < 1) { visValue2 = Math.log(correctionValue) / 5 } else { visValue2 = Math.log(rawValue2) / 5 }
 
 		object00.visValue = visValue2;
 		object00.scale.y = visValue2;
@@ -981,7 +687,7 @@ function fillGraph(name, dataSet, layerNumber) {
 		object01.year = dataSet.Year;
 		var visValue2;
 
-		if ( rawValue2 < 1 ) { visValue2 = Math.log(correctionValue) } else { visValue2 = Math.log(rawValue2)}
+		if (rawValue2 < 1) { visValue2 = Math.log(correctionValue) / 5 } else { visValue2 = Math.log(rawValue2) / 5 }
 
 		object01.visValue = visValue2;
 		object01.scale.y = visValue2;
@@ -993,7 +699,7 @@ function fillGraph(name, dataSet, layerNumber) {
 		object02.year = dataSet.Year;
 		var visValue2;
 
-		if ( rawValue2 < 1 ) { visValue2 = Math.log(correctionValue) } else { visValue2 = Math.log(rawValue2) }
+		if (rawValue2 < 1) { visValue2 = Math.log(correctionValue) / 5 } else { visValue2 = Math.log(rawValue2) / 5 }
 
 		object02.visValue = visValue2;
 		object02.scale.y = visValue2;
@@ -1004,8 +710,8 @@ function fillGraph(name, dataSet, layerNumber) {
 		object2.state = dataSet.State;
 		object2.year = dataSet.Year;
 		var visValue2;
-		
-		if ( rawValue2 < 1 ) { visValue2 = Math.log(correctionValue) } else { visValue2 = Math.log(rawValue2) }
+
+		if (rawValue2 < 1) { visValue2 = Math.log(correctionValue) / 5 } else { visValue2 = Math.log(rawValue2) / 5 }
 
 		object2.visValue = visValue2;
 		object2.scale.y = visValue2;
@@ -1013,13 +719,11 @@ function fillGraph(name, dataSet, layerNumber) {
 
 	// heightsGlobal2[layerNumber] = visValue2; // not needed for now
 
-	var visValueMax = 0; // maxium of visValue
-
 	for (var i = 0; i < 3; i++) {
 		for (var j = 0; j < 3; j++) {
-			var firstLetter = i+1;
-			var secondLetter = j+1;
-			var object = scene.getObjectByName( ''+name+'-'+firstLetter+''+secondLetter+'' );
+			var firstLetter = i + 1;
+			var secondLetter = j + 1;
+			var object = scene.getObjectByName( '' + name + '-' + firstLetter + '' + secondLetter + '' );
 
 			if (firstLetter == 1) {
 				object.sector = 'Home';
@@ -1051,41 +755,19 @@ function fillGraph(name, dataSet, layerNumber) {
 			object.year = dataSet.Year;
 
 			var visValue;
-
-			if ( rawValue < 1 ) { visValue = Math.log(correctionValue) } else { visValue = Math.log(rawValue) }
+			visValue = hash[rawValue];
+			// if ( rawValue < 1 ) { visValue = Math.log(correctionValue) } else {  }
 
 			layer[layerNumber].push(object);
 			object.visValue = visValue;
 			object.scale.y = visValue;
-
-			if (visValueMax < visValue) {
-				visValueMax = visValue;
-			}				
 		}
-	}
-
-	if (visValueMax > VIS_VAL_MAX) {
-		// if visible value is too large, adjust it
-		var divider4Adjust = visValueMax / VIS_VAL_MAX;
-		for (var i = 0; i < 3; i++) {
-			for (var j = 0; j < 3; j++) {
-				var firstLetter = i + 1;
-				var secondLetter = j + 1;
-				var object = scene.getObjectByName('' + name + '-' + firstLetter + '' + secondLetter + '');
-				var newVisValue = object.visValue / divider4Adjust;
-				object.visValue = newVisValue;
-				object.scale.y = newVisValue;
-			}
-		}
-	}
-
-	showTotalEnergySum();    
+	}    
 }
 
 function updateGraphVisually() {
 	for (var i = 0; i < 3; i++) {
 		heightsGlobal[i] = [];
-
 		for (var j = 0; j < 3; j++) {
 			heightsGlobal[i][j] = 0;
 		}
@@ -1111,7 +793,7 @@ function updateGraphVisually() {
 
 				var object = scene.getObjectByName('' + sortedLayers[k].name + '-' + firstLetter + '' + secondLetter + '');
 
-				if ( sortedLayers[k].name == 'B' ) {
+				if (sortedLayers[k].name == 'B') {
 					object.position.y = object.visValue / 2;
 					heightsGlobal[i][j] += object.visValue;
 				} else {
@@ -1151,6 +833,7 @@ function updateGraphVisually() {
 
 	var object8 = scene.getObjectByName( 'A6' );
 	object8.position.y = object8.visValue / 2 + object00.visValue + object01.visValue + object02.visValue + object2.visValue + object3.visValue + object4.visValue + object5.visValue + object6.visValue + object7.visValue;
+
 }
 
 // function updateChart() {
@@ -1179,7 +862,6 @@ function makeFlat(){
 	scene.getObjectByName( 'A3' ).scale.z = 0.01;
 	scene.getObjectByName( 'A6' ).scale.z = 0.01;
 }
-
 function makeFat(){
 	scene.getObjectByName( 'B00' ).scale.z = 1;
 	scene.getObjectByName( 'B01' ).scale.z = 1;
@@ -1192,7 +874,6 @@ function makeFat(){
 	scene.getObjectByName( 'A3' ).scale.z = 1;
 	scene.getObjectByName( 'A6' ).scale.z = 1;
 }
-
 $('.mdl-radio__button').click(function() {
 	var value = $(this).attr('value');
 
@@ -1200,26 +881,27 @@ $('.mdl-radio__button').click(function() {
 		rotateGraph(Math.PI);
 		makeFat();
 		cameraControls.enabled = true;
-		cameraTarget = new THREE.Vector3( 0, 30, 0 );
+		cameraTarget = new THREE.Vector3(0, 30, 0);
 	}
 	if (value == '2') {
 		rotateGraph(0);
 		makeFat();
 		cameraControls.enabled = true;
-		cameraTarget = new THREE.Vector3( 0, 10, 0 );
+		cameraTarget = new THREE.Vector3(0, 10, 0);
 	}
 	if (value == '3') {
 		rotateGraph(0);
 		cameraControls.reset();
 		cameraControls.enabled = false;
 		makeFlat();
-		cameraTarget = new THREE.Vector3( 0, 20, 0 );
+		cameraTarget = new THREE.Vector3(0, 20, 0);
 	}
 });
 
 $('#popup').hover(function() {
   $('#popup').removeClass('close');
 });
+
 $( '#popup' ).mouseleave(function() {
   $('#popup').addClass('close');
 });
@@ -1227,12 +909,12 @@ $( '#popup' ).mouseleave(function() {
 $('.filter-item').click(function() {
 	var clickedId = $(this).attr('id');
 
-	if ( $(this).hasClass('on') ) {
+	if ($(this).hasClass('on')) {
 		$(this).removeClass('on');
 		$(this).addClass('off');
 
 		for (var i = graph.length - 1; i >= 0; i--) {
-			if( graph[i].energyType == clickedId ) {
+			if (graph[i].energyType == clickedId) {
 				graph[i].visible = false;
 			}
 		}
@@ -1241,19 +923,17 @@ $('.filter-item').click(function() {
 		$(this).addClass('on');
 
 		for (var i = graph.length - 1; i >= 0; i--) {
-			if (graph[i].energyType == clickedId && ((graph[i].name.indexOf("-") >= 0 && $('#filter-item2-' + graph[i].name.slice(-1)).hasClass('on'))) ) {
+			if (graph[i].energyType == clickedId) {
 				graph[i].visible = true;
 			}
 		}
 	}
-
-	showTotalEnergySum();
 });
 
 $('.filter-item2').click(function() {
-	var clickedId = $(this).attr('id').slice(-1);
+	var clickedId = $(this).attr('id');
 
-	if ( $(this).hasClass('on') ) {
+	if ($(this).hasClass('on')) {
 		$(this).removeClass('on');
 		$(this).addClass('off');
 
@@ -1267,50 +947,19 @@ $('.filter-item2').click(function() {
 		$(this).addClass('on');
 
 		for (var i = graph.length - 1; i >= 0; i--) {
-			if ((graph[i].name.slice(-3) == '-1' + clickedId || graph[i].name.slice(-3) == '-2' + clickedId || graph[i].name.slice(-3) == '-3' + clickedId) && $('#' + graph[i].energyType).hasClass('on') ) {
+			if ((graph[i].name.slice(-3) == '-1' + clickedId || graph[i].name.slice(-3) == '-2' + clickedId || graph[i].name.slice(-3) == '-3' + clickedId)) {
 				graph[i].visible = true;
 			}
 		}
 	}
-
-	showTotalEnergySum();
 });
 
-$('.filter-item3').click(function () {
-	if ($(this).hasClass('on')) {
-		$(this).removeClass('on').addClass('off');
-		$('.range-slider-wrapper').addClass('hidden');
-	} else {
-		$(this).removeClass('off').addClass('on');
-		$('.range-slider-wrapper').removeClass('hidden');
-	}
-});
+simplemaps_usmap.hooks.click_state = function(id) {
+	stateId = id;
+	stateName = simplemaps_usmap_mapdata.state_specific[id].name;
+	changeData(currentYear);
+}
 
-// simplemaps_usmap.hooks.click_state=function(id){
-//     stateId = id;
-//     stateName = simplemaps_usmap_mapdata.state_specific[id].name;
-//     changeData(currentYear);
-//     console.log('Changed state: ',id,'Current year: ',currentYear);
-// }
-
-/*
- * 
- * Function to handle the Click Event for cubes
- * 
- */
-// function onDocumentClickPopUp(event) {
-// 	var raycaster = new THREE.Raycaster();
-// 	raycaster.setFromCamera(mouse, camera);
-// 	var intersects = raycaster.intersectObjects(graph);
-// 	if (intersects.length > 0) {
-// 		cubeName = intersects[0].object.name;
-// 		treeMapDate = formTreeMapDataForCube(cubeName);
-// 		// Display Modal
-// 		var modal = document.getElementById('treeMapPopUp');
-// 		$("#treeMapPopUp .modelContentBody").html(treeMapDate);
-// 		modal.style.display = "block";
-// 	}
-// }
 function onDocumentClickPopUp(id) {
 	var raycaster = new THREE.Raycaster();
 
@@ -1526,5 +1175,3 @@ function closePopUp() {
 	var modal = document.getElementById('treeMapPopUp');
 	modal.style.display = "none";
 }
-
-// onDocumentClickPopUp();
