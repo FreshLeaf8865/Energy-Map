@@ -4,36 +4,78 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   <link href='https://fonts.googleapis.com/css?family=Roboto:100,400,300,500,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="css/font-awesome.min.css">
   <script type="text/javascript" src="js/jquery.min.js"></script>
   <script src="js/three.js"></script>
   <script src="js/OBJLoader.js"></script>
   <script src="js/stats.min.js"></script>
-  <script src="./lib/bower_components/subunit/demos/bower_components/d3/d3.js"></script>
   <script src="js/Detector.js"></script>
   <script src="js/STLLoader.js"></script>
   <script src="js/OrbitControls.js"></script>
   <script src="js/tween.js"></script>
-  <script src="./lib/threejs/examples/js/controls/TrackballControls.js"></script>
-  <script src="./lib/bower_components/subunit/dist/subunit.js"></script>
+
   <script src="js/mapdata.js"></script>
-  <!-- <script src="js/usmap.js"></script> -->
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script> -->
-  
+  <script src="js/usmap.js"></script>
+
+  <!--     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script> -->
+
   <link rel="stylesheet" href="css/material.css">
   <script src="js/material.min.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+  <!--New TreeMapScripts-->
+  <script src="lib/bower_components/subunit/demos/bower_components/stats.js/build/stats.min.js"></script>
+  <script src="lib/bower_components/subunit/demos/bower_components/d3/d3.js"></script>
+  <script src="lib/bower_components/subunit/demos/bower_components/tweenjs/build/tween.min.js"></script>
+  <script src="lib/threejs/examples/js/controls/TrackballControls.js"></script>
+  <script src="lib/bower_components/subunit/dist/subunit.js"></script>
+  <script src="lib/bower_components/traceur/traceur.js"></script>
+  <script src="lib/bower_components/traceur/bootstrap.js"></script>
+
+  <!--Bootstrap 3.3.7-->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <!--Ammp Map Scripts-->
+  <script src="js/amcharts/ammap.js"></script>
+  <script src="js/amcharts/usaLow.js"></script>
+  <script src="js/amcharts/usa2low.js"></script>
+  <script src="js/amcharts/worldLow.js"></script>
+  <script src="js/amcharts/light.js"></script>
+  
   <link rel="stylesheet" href="css/nouislider.css">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/nouislider.js"></script>
 </head>
 <body>
+  <div class="waiting-loader"><img src="img/site-loader.gif" title="Loading" /></div>
+  <div id="selectedMapHiddenData">
+    <input type="text" id="txtHiddenState" hidden=""/>
+    <input type="text" id="txtHiddenCounty" hidden=""/>
+    <input type="text" id="txtHiddenCity" hidden=""/>
+  </div>
   <div class="img_logo"><img src="img/logo.png"></div>
   <div class="logo">Energy Data</div>
   <div id="canvas"></div>
-  <!-- <div class="controls cont">
-      <div class="hdr" id="front">Select region</div>
-      <div id="map"></div>
-  </div> -->
+  <div class="controls cont" style="width:33%;">
+    <div style="text-align: center; top: 0;">
+      <img id="countryImage" src="img/US_State_Maps/ny.png" style="width: 45px;margin-bottom: 10px;">
+    </div>
+    <div class="hdr" id="front">Select region
+      <div class="btn-group btn-toggle map-toogle-menu">
+        <button class="map-toggle btn btn-xs btn-default" id="ww">Worldwide</button>
+        <button class="map-toggle btn btn-xs btn-success active" id="usa" disabled="disabled">U.S</button>  
+        <button class="map-toggle btn btn-xs btn-default usa-sub-menu showSub" disabled="disabled" id="usa-counties">County</button>
+        <button class="map-toggle btn btn-xs btn-default usa-sub-menu showSub" disabled="disabled" id="usa-cities">City</button>
+      </div>
+    </div>
+    <!--<div id="map"></div>-->
+    <div class="drawMap" id="drawStatesMap"></div>
+    <div class="drawMap" id="drawWorldwideMap" style="display: none"></div>
+    <div class="drawMap" id="drawUsaCountyMap" style="display: none"></div>
+    <div class="drawMap" id="drawUsaCountyCitiesMap"></div>
+  </div>
   <div class="popup" id="popup">
     SOME INFO
   </div>
@@ -68,36 +110,29 @@
     <div class="filter-item3 on"><img src="img/icon_electricity.png"></div>
   </div>
   <div class="data_mode">
-    <ul class="demo-list-control mdl-list">
-      <li class="mdl-list__item">
-        <span class="dark_mode mdl-list__item-primary-content">
-          Full 3D mode
-        </span>
-        <span class="mdl-list__item-secondary-action">
-          <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
-            <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked/>
-          </label>
-        </span>
+    <ul class="demo-list-control mdl-list mode-view-listing">
+      <li class="selected-mode">
+        <div class="cc-selector-2">
+          <input  checked="checked" id="full3d-mode" name="options" value="1"  class="mdl-radio__button" type="radio" />
+          <label class="drinkcard-cc full3d-mode" for="full3d-mode"></label>
+        </div>
+        <span>Full 3D mode</span>
       </li>
-      <li class="mdl-list__item">
-        <span class="dark_mode mdl-list__item-primary-content">
-          3D simplified
-        </span>
-        <span class="mdl-list__item-secondary-action">
-          <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-2">
-            <input type="radio" id="list-option-2" class="mdl-radio__button" name="options" value="2"/>
-          </label>
-        </span>
+
+      <li>
+        <div class="cc-selector-2">
+          <input id="d3Simplified-mode" type="radio" class="mdl-radio__button" name="options" value="2" />
+          <label class="drinkcard-cc d3Simplified-mode" for="d3Simplified-mode"></label>
+        </div>
+        <span>3D simplified</span>
       </li>
-      <li class="mdl-list__item">
-        <span class="dark_mode mdl-list__item-primary-content">
-          Full 2D mode
-        </span>
-        <span class="mdl-list__item-secondary-action">
-          <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-3">
-            <input type="radio" id="list-option-3" class="mdl-radio__button" name="options" value="3"/>
-          </label>
-        </span>
+
+      <li>
+        <div class="cc-selector-2">
+          <input id="full2d-mode" class="mdl-radio__button" type="radio" name="options" value="3" />
+          <label class="drinkcard-cc full2d-mode" for="full2d-mode"></label>
+        </div>
+        <span>Full 2D mode</span>
       </li>
     </ul>
   </div>
